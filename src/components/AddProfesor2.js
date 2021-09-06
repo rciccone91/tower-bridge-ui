@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import {handleResponse} from "../http-common";
+import config from "../config"
 
 
 const validationSchema = Yup.object().shape({
@@ -27,6 +28,8 @@ const validationSchema = Yup.object().shape({
 
 });
 
+const navigateSubmitOk = `${config.appDns}/profesores`
+
 function AddProfesor2(props){
   const {
   register,
@@ -42,7 +45,7 @@ function AddProfesor2(props){
     // console.log("navigation: "+ JSON.stringify(navigation, null, 2))
     console.log("estoy en onSubmit")
     createProfesor(data).then((response) => {
-      handleResponse(200,response,"http://localhost:8081/profesores","Hubo un error al agregar el profesor")
+      handleResponse(200,response,navigateSubmitOk,"Hubo un error al agregar el profesor")
     })
   };
 
