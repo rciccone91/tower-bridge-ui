@@ -1,12 +1,12 @@
 import http from "../http-common";
+import swal from '@sweetalert/with-react';
 
 class ProfesoresService {
     getAll() {
-
         return http.get("/profesores").catch(error => {
             if (!error.response) {
                 // network error
-                alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
+                swal({ title: 'Error', icon: 'error', text: 'Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador'});
             } else {
                 this.errorStatus = error.response.data.message;
             }
@@ -17,7 +17,8 @@ class ProfesoresService {
         return http.get(`/profesores/${id}`).catch(error => {
             if (!error.response) {
                 // network error
-                alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
+                swal({ title: 'Error', icon: 'error', text: 'Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador'});
+                // alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
             } else {
                 this.errorStatus = error.response.data.message;
             }
@@ -28,7 +29,8 @@ class ProfesoresService {
         return http.post("/profesores", data).catch(error => {
             if (!error.response) {
                 // network error
-                alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
+                swal({ title: 'Error', icon: 'error', text: 'Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador'});
+                // alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
             } else {
                 this.errorStatus = error.response.data.message;
             }
@@ -36,10 +38,11 @@ class ProfesoresService {
     }
 
     update(id, data) {
-        return http.put(`/profesores/${id}`, data).catch(error => {
+        return http.patch(`/profesores/${id}`, data).catch(error => {
             if (!error.response) {
                 // network error
-                alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
+                swal({ title: 'Error', icon: 'error', text: 'Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador'});
+                // alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
             } else {
                 this.errorStatus = error.response.data.message;
             }
@@ -50,7 +53,8 @@ class ProfesoresService {
         return http.delete(`/profesores/${id}`).catch(error => {
             if (!error.response) {
                 // network error
-                alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
+                swal({ title: 'Error', icon: 'error', text: 'Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador'});
+                // alert('Un error inesperado ocurrió al buscar los datos. Por favor contactar al administrador');
             } else {
                 this.errorStatus = error.response.data.message;
             }

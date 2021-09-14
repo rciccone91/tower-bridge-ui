@@ -1,43 +1,9 @@
 import {
     CREATE_PROFESOR, DELETE_PROFESOR,
-    RETRIEVE_PROFESORES, UPDATE_TUTORIAL
+    RETRIEVE_PROFESORES, UPDATE_TUTORIAL, SELECT_PROFESOR
 } from "./types";
 
 import ProfesoresService from "../services/ProfesoresService";
-
-// export const createProfesor = (nombreApellido,
-//                                dni,
-//                                edad,
-//                                detalles,
-//                                cbuCvu,
-//                                experienciaPrevia,
-//                                valorHoraDiferenciado,
-//                                domicilio,
-//                                telefono,
-//                                email) => async (dispatch) => {
-//     try {
-//         const res = await ProfesoresService.create({ nombreApellido,
-//             dni,
-//             edad,
-//             detalles,
-//             cbuCvu,
-//             experienciaPrevia,
-//             valorHoraDiferenciado,
-//             domicilio,
-//             telefono,
-//             email });
-//
-//         dispatch({
-//             type: CREATE_PROFESOR,
-//             payload: res.data,
-//         });
-//
-//         return Promise.resolve(res.data);
-//     } catch (err) {
-//         return Promise.reject(err);
-//     }
-// };
-
 
 export async function createProfesor(data) {
     try {
@@ -48,7 +14,18 @@ export async function createProfesor(data) {
     } catch (err) {
         return Promise.reject(err);
     }
-};
+}
+
+export async function updateProfesor(id,data) {
+    try {
+        console.log("estoy en updateProfesor")
+        const res = await ProfesoresService.update(id,data);
+
+        return Promise.resolve(res);
+    } catch (err) {
+        return Promise.reject(err);
+    }
+}
 
 export const retrieveProfesores = () => async (dispatch) => {
     try {
@@ -62,31 +39,14 @@ export const retrieveProfesores = () => async (dispatch) => {
     }
 };
 
-export const updateProfesor = (id, data) => async (dispatch) => {
+export async function deleteProfesor(id){
     try {
-        const res = await ProfesoresService.update(id, data);
+        console.log("estoy en deleteProfesor")
+        const res = await ProfesoresService.delete(id);
 
-        dispatch({
-            type: UPDATE_TUTORIAL,
-            payload: data,
-        });
-
-        return Promise.resolve(res.data);
+        return Promise.resolve(res);
     } catch (err) {
         return Promise.reject(err);
-    }
-};
-
-export const deleteProfesor = (id) => async (dispatch) => {
-    try {
-      await ProfesoresService.delete(id);
-
-      dispatch({
-        type: DELETE_PROFESOR,
-        payload: { id },
-      });
-    } catch (err) {
-      console.log(err);
     }
 };
 

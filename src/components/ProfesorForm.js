@@ -1,15 +1,18 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import { createProfesor } from "../actions/profesores";
+import React, { useEffect } from "react";
+import {createProfesor, updateProfesor} from "../actions/profesores";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import {handleResponse} from "../http-common";
 import config from "../config"
+import ProfesoresService from "../services/ProfesoresService";
+import swal from '@sweetalert/with-react';
 
 
 const validationSchema = Yup.object().shape({
-  nombreApellido: Yup.string().required('El nombre y apellido es requerido'),
+  nombreApellido: Yup.string()
+      .required('El nombre y apellido es requerido')
+      .matches('^(?!\\s*$).+',{message: 'El nombre y apellido no puede estar vacío'}),
   dni: Yup.number()
       .typeError('El DNI debe ser un número')
       .required('DNI es requerido')
@@ -24,29 +27,84 @@ const validationSchema = Yup.object().shape({
   email: Yup.string()
       .required('El email es requerido')
       .email('El email es invalido'),
-  //TODO - resto de las validaciones
+
+  cbuCvu: Yup.string()
+      .required('El CBU / CVU es requerido')
+      .matches('^(?!\\s*$).+',{message: 'El CBU / CVU no puede estar vacío'}),
+
+  experienciaPrevia: Yup.string()
+      .required('Los datos de experiencia previa son requeridos')
+      .matches('^(?!\\s*$).+',{message: 'Los datos de experiencia previa no pueden estar vacío'}),
+
+  domicilio: Yup.string()
+      .required('El domicilio es requerido.')
+      .matches('^(?!\\s*$).+',{message: 'El domicilio no puede estar vacío'}),
+
+  telefono: Yup.string()
+      .required('El teléfono es requerido.')
+      .matches('^(?!\\s*$).+',{message: 'El teléfono no puede estar vacío'}),
 
 });
 
-const navigateSubmitOk = `${config.appDns}/profesores`
+const navigateProfesores = `${config.appDns}/profesores`
 
-function AddProfesor2(props){
+function ProfesorForm(props){
+
+  const id = props && props.props ? props.props.params.id : undefined
+
+  // const [state, setState] = useState([])
+
   const {
-  register,
-  handleSubmit,
-  // reset,
-  formState: { errors }
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
   } = useForm({
-    resolver: yupResolver(validationSchema)
-  });
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      nombreApellido:"",
+      dni:"",
+      edad:"",
+      detalles:"",
+      cbuCvu:"",
+      experienciaPrevia:"",
+      valorHoraDiferenciado:false,
+      domicilio:"",
+      telefono:"",
+      email:""
+    }});
+
+  useEffect(() => {
+    if(id){
+      ProfesoresService.get(id).then(
+          res =>  {
+            if(res){
+              reset(res.data)
+            } else {
+              swal({
+                title: "Error",
+                text: 'Un error ocurrió al buscar el profesor requerido. Por favor verifica que el mismo exista o contacta al administrador.',
+                icon: "error",
+                button: "OK"
+              }).then(() => {
+                window.location = navigateProfesores
+              })
+            }
+          });
+    }
+  },[id,reset])
+
 
   const onSubmit = (data) => {
-    console.log(JSON.stringify(data, null, 2));
-    // console.log("navigation: "+ JSON.stringify(navigation, null, 2))
-    console.log("estoy en onSubmit")
-    createProfesor(data).then((response) => {
-      handleResponse(200,response,navigateSubmitOk,"Hubo un error al agregar el profesor")
-    })
+    if(id){
+      updateProfesor(id,data).then((response) => {
+        handleResponse(200,response,navigateProfesores,"Hubo un error al actualizar el profesor", "El profesor fue correctamente actualizado.")
+      })
+    } else {
+      createProfesor(data).then((response) => {
+        handleResponse(200,response,navigateProfesores,"Hubo un error al agregar el profesor", "El profesor fue correctamente dado de alta.")
+      })
+    }
   };
 
     return (
@@ -146,7 +204,7 @@ function AddProfesor2(props){
             </div>
 
             <div className="form-group">
-              <label>Telefono</label>
+              <label>Teléfono</label>
               <input
                   name="telefono"
                   type="text"
@@ -171,25 +229,9 @@ function AddProfesor2(props){
               <button type="submit" className="btn btn-primary">
                 Guardar
               </button>
-              {/*<button*/}
-              {/*    type="button"*/}
-              {/*    onClick={reset}*/}
-              {/*    className="btn btn-warning float-right"*/}
-              {/*>*/}
-              {/*  Limpiar*/}
-              {/*</button>*/}
             </div>
           </form>
         </div>);
 }
 
-export default AddProfesor2
-
-
-// class AddProfesor2 extends Component {
-//
-//   render() {
-//         AddProfesorFunc()
-//   }
-// }
-// export default connect(null, { createProfesor })(AddProfesor2);
+export default ProfesorForm

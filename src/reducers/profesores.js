@@ -4,6 +4,7 @@ import {
     UPDATE_PROFESOR,
     DELETE_PROFESOR,
     DELETE_ALL_PROFESORES,
+    SELECT_PROFESOR
 } from "../actions/types";
 
 const initialState = [];
@@ -32,6 +33,18 @@ function profesorReducer(profesores = initialState, action) {
 
         case DELETE_PROFESOR:
             return profesores.filter(({ id }) => id !== payload.id);
+
+        case SELECT_PROFESOR:
+            return profesores.map((profesor) => {
+                if (profesor.id === payload.id) {
+                    return {
+                        ...profesor,
+                        ...payload.selected,
+                    };
+                } else {
+                    return profesor;
+                }
+            });
 
         case DELETE_ALL_PROFESORES:
             return [];

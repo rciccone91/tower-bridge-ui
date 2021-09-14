@@ -3,11 +3,8 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-import AddTutorial from "./components/add-tutorial.component";
-import Tutorial from "./components/tutorial.component";
-import TutorialsList from "./components/tutorials-list.component";
-import AddProfesor from "./components/AddProfesor";
-import AddProfesor2 from "./components/AddProfesor2";
+import ProfesorForm from "./components/ProfesorForm";
+import ProfesoresList from "./components/ProfesorList";
 
 class App extends Component {
   render() {
@@ -33,21 +30,20 @@ class App extends Component {
             {/*    Add Prof1*/}
             {/*  </Link>*/}
             {/*</li>*/}
-            <li className="nav-item">
-              <Link to={"/addProfesor2"} className="nav-link">
-                Add Prof
-              </Link>
-            </li>
+            {/*<li className="nav-item">*/}
+            {/*  <Link to={"/profesorForm"} className="nav-link">*/}
+            {/*    Add Prof*/}
+            {/*  </Link>*/}
+            {/*</li>*/}
           </div>
         </nav>
 
         <div className="container mt-3">
           <Switch>
-            <Route exact path={["/", "/profesores"]} component={TutorialsList} />
-            {/*<Route exact path="/add" component={AddTutorial} />*/}
-            <Route path="/profesores/:id" component={Tutorial} />
-            {/*<Route path="/addProfesor" component={AddProfesor} />*/}
-            <Route path="/addProfesor2" component={AddProfesor2} />
+            <Route exact path={["/", "/profesores"]} component={ProfesoresList} />
+            <Route path="/profesores/:id" render={(props) => <ProfesorForm props={props.match}/>} />/>
+            {/*<Route path="/profesorForm" render={(props) => (<ProfesorForm {...props} isAuthed={true} />)} />*/}
+            <Route path="/profesorForm" component={ProfesorForm}/>
           </Switch>
         </div>
       </Router>

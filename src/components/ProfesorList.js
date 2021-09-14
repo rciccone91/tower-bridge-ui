@@ -1,30 +1,38 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import swal from '@sweetalert/with-react';
+import {deleteProfesor} from "../actions/profesores";
+
 
 import {
-  // retrieveTutorials,
   findTutorialsByTitle,
-  deleteAllTutorials,
 } from "../actions/tutorials";
 
 import {
   retrieveProfesores,
 } from "../actions/profesores";
 import { Link } from "react-router-dom";
+import {handleResponse} from "../http-common";
+import config from "../config";
 
-class TutorialsList extends Component {
+const navigateDeleteOk = `${config.appDns}/profesores`
+
+class ProfesoresList extends Component {
+
+
   constructor(props) {
     super(props);
     this.onChangeSearchTitle = this.onChangeSearchTitle.bind(this);
     this.refreshData = this.refreshData.bind(this);
-    this.setActiveTutorial = this.setActiveTutorial.bind(this);
+    this.setActiveProfesor = this.setActiveProfesor.bind(this);
     this.findByTitle = this.findByTitle.bind(this);
-    this.removeAllTutorials = this.removeAllTutorials.bind(this);
+    // this.onCancel = this.onCancel.bind(this);
+    this.showConfirmation = this.showConfirmation.bind(this);
 
     this.state = {
       currentProfesor: null,
       currentIndex: -1,
-      searchTitle: "",
+      searchTitle: ""
     };
   }
 
@@ -47,24 +55,27 @@ class TutorialsList extends Component {
     });
   }
 
-  setActiveTutorial(tutorial, index) {
+  setActiveProfesor(profesor, index) {
     this.setState({
-      currentProfesor: tutorial,
+      currentProfesor: profesor,
       currentIndex: index,
     });
   }
 
-  removeAllTutorials() {
-    this.props
-      .deleteAllTutorials()
-      .then((response) => {
-        console.log(response);
-        this.refreshData();
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }
+  showConfirmation(){
+    swal({
+      title: "Eliminar",
+      text: "Se va a eliminar el profesor "+this.props.currentProfesor.nombreApellido+". Por favor, confirmar dicha acción.",
+      icon: "warning",
+      buttons: ["Cancelar", "Eliminar"]
+    });
+  };
+
+  deleteProfesor(id){
+    deleteProfesor(id).then((response) => {
+      handleResponse(204,response,navigateDeleteOk,"Hubo un error al eliminar el profesor", "El profesor fue correctamente eliminado.")
+    })
+  };
 
   findByTitle() {
     this.refreshData();
@@ -78,44 +89,44 @@ class TutorialsList extends Component {
 
     return (
       <div className="list row">
-        <div className="col-md-8">
-          <div className="input-group mb-3">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Buscar por Nombre"
-              value={searchTitle}
-              onChange={this.onChangeSearchTitle}
-            />
-            <div className="input-group-append">
-              <button
-                className="btn btn-outline-secondary"
-                type="button"
-                onClick={this.findByTitle}
-              >
-                Search
-              </button>
-            </div>
-          </div>
-          <div className="input-group mb-3">
-            <input
-                type="text"
-                className="form-control"
-                placeholder="Buscar por curso"
-                value={searchTitle}
-                onChange={this.onChangeSearchTitle}
-            />
-            <div className="input-group-append">
-              <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  onClick={this.findByTitle}
-              >
-                Search
-              </button>
-            </div>
-          </div>
-        </div>
+        {/*<div className="col-md-8">*/}
+        {/*  <div className="input-group mb-3">*/}
+        {/*    <input*/}
+        {/*      type="text"*/}
+        {/*      className="form-control"*/}
+        {/*      placeholder="Buscar por Nombre"*/}
+        {/*      value={searchTitle}*/}
+        {/*      onChange={this.onChangeSearchTitle}*/}
+        {/*    />*/}
+        {/*    <div className="input-group-append">*/}
+        {/*      <button*/}
+        {/*        className="btn btn-outline-secondary"*/}
+        {/*        type="button"*/}
+        {/*        onClick={this.findByTitle}*/}
+        {/*      >*/}
+        {/*        Search*/}
+        {/*      </button>*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*  <div className="input-group mb-3">*/}
+        {/*    <input*/}
+        {/*        type="text"*/}
+        {/*        className="form-control"*/}
+        {/*        placeholder="Buscar por curso"*/}
+        {/*        value={searchTitle}*/}
+        {/*        onChange={this.onChangeSearchTitle}*/}
+        {/*    />*/}
+        {/*    <div className="input-group-append">*/}
+        {/*      <button*/}
+        {/*          className="btn btn-outline-secondary"*/}
+        {/*          type="button"*/}
+        {/*          onClick={this.findByTitle}*/}
+        {/*      >*/}
+        {/*        Search*/}
+        {/*      </button>*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*</div>*/}
         <div className="col-md-6">
           <h4>Profesores</h4>
 
@@ -127,20 +138,19 @@ class TutorialsList extends Component {
                       "list-group-item " +
                       (index === currentIndex ? "active" : "")
                     }
-                    onClick={() => this.setActiveTutorial(profesor, index)}
+                    onClick={() => this.setActiveProfesor(profesor, index)}
                     key={index}
                   >
                     {profesor.nombreApellido}
                   </li>
                 ))}
             </ul>
-
-          <button
+          <Link
+              to={"/profesorForm"}
             className="m-3 btn btn-sm btn-danger"
-            onClick={this.removeAllTutorials}
           >
-            Remove All
-          </button>
+            Agregar Profesor
+          </Link>
         </div>
         <div className="col-md-6">
           {currentProfesor ? (
@@ -169,14 +179,23 @@ class TutorialsList extends Component {
                 <Link
                   to={"/profesores/" + currentProfesor.id}
                   className="btn btn-primary btn-sm"
-
                 >
                   Modificar
                 </Link>
                 <button
                     className="btn btn-danger btn-sm"
                     type="button"
-                    onClick={this.findByTitle}
+                    onClick={() => swal({
+                      title: "Eliminar",
+                      text: "Se va a eliminar el profesor "+currentProfesor.nombreApellido+". Por favor, confirmar dicha acción.",
+                      icon: "warning",
+                      buttons: ["Cancelar", "Eliminar"]
+                    }).then(selection => {
+                        if(selection){
+                          this.deleteProfesor(currentProfesor.id)
+                        }
+                      })
+                    }
                     style={{marginLeft:20}}
                 >
                   Eliminar
@@ -202,6 +221,5 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   retrieveProfesores,
-  findTutorialsByTitle,
-  deleteAllTutorials,
-})(TutorialsList);
+  findTutorialsByTitle
+})(ProfesoresList);
