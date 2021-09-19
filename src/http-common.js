@@ -10,7 +10,22 @@ export default axios.create({
   }
 });
 
-export function handleResponse(expectedStatusCode,response,navigate,errorMsg,okMsg)
+
+export function handleError(errorResponse,navigate,errorMsg)
+{
+  if(errorResponse && errorResponse.data) {
+    swal({
+      title: "Error",
+      text: errorMsg+". Detalles: "+errorResponse.data.errorMessage,
+      icon: "error",
+      button: "OK"
+    })
+  } else {
+    showError(navigate)
+  }
+}
+
+export function handleResponse(expectedStatusCode,response,navigate,okMsg)
 {
   if(response && response.status === expectedStatusCode){
     swal({
@@ -20,20 +35,12 @@ export function handleResponse(expectedStatusCode,response,navigate,errorMsg,okM
     }).then(() => {
       window.location = navigate
     })
-  } else if( response && response.status !== expectedStatusCode) {
-    // alert(errorMsg+". Detalles: "+response.statusText+". "+response.data)
-    swal({
-      title: "Error",
-      text: errorMsg+". Detalles: "+response.statusText+". "+response.data,
-      icon: "error",
-      button: "OK"
-    })
   } else {
-    showError(errorMsg,response,navigate)
+    showError(navigate)
   }
 }
 
-function showError(errorMsg,response,navigate){
+function showError(navigate){
   swal({
     title: "Error",
     text: 'Un error inesperado ocurrió al conectarse con los servicios. Por favor contactar al administrador',

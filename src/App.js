@@ -5,13 +5,15 @@ import "./App.css";
 
 import ProfesorForm from "./components/ProfesorForm";
 import ProfesoresList from "./components/ProfesorList";
+import ProfesorDetail from "./components/ProfesorDetail";
+import Home from "./components/Home";
 
 class App extends Component {
   render() {
     return (
       <Router>
         <nav className="navbar navbar-expand navbar-dark bg-secondary">
-          <Link to={"/profesores"} className="navbar-brand" >
+          <Link to={"/home"} className="navbar-brand" >
             Tower Bridge
           </Link>
           <div className="navbar-nav mr-auto">
@@ -20,30 +22,16 @@ class App extends Component {
                 Profesores
               </Link>
             </li>
-            {/*<li className="nav-item">*/}
-            {/*  <Link to={"/add"} className="nav-link">*/}
-            {/*    Add*/}
-            {/*  </Link>*/}
-            {/*</li>*/}
-            {/*<li className="nav-item">*/}
-            {/*  <Link to={"/addProfesor"} className="nav-link">*/}
-            {/*    Add Prof1*/}
-            {/*  </Link>*/}
-            {/*</li>*/}
-            {/*<li className="nav-item">*/}
-            {/*  <Link to={"/profesorForm"} className="nav-link">*/}
-            {/*    Add Prof*/}
-            {/*  </Link>*/}
-            {/*</li>*/}
           </div>
         </nav>
 
         <div className="container mt-3">
           <Switch>
-            <Route exact path={["/", "/profesores"]} component={ProfesoresList} />
-            <Route path="/profesores/:id" render={(props) => <ProfesorForm props={props.match}/>} />/>
-            {/*<Route path="/profesorForm" render={(props) => (<ProfesorForm {...props} isAuthed={true} />)} />*/}
+            <Route exact path={["/","/home"]} render={(props) => <Home props={props}/>} />
+            <Route exact path={"/profesores"} component={ProfesoresList} />
+            <Route path="/profesores/:id" render={(props) => <ProfesorForm props={props.match}/>} />
             <Route path="/profesorForm" component={ProfesorForm}/>
+            <Route path="/profesor/detail/:id" render={(props) => <ProfesorDetail props={props.match}/>}/>
           </Switch>
         </div>
       </Router>

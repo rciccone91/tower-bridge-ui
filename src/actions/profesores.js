@@ -4,6 +4,8 @@ import {
 } from "./types";
 
 import ProfesoresService from "../services/ProfesoresService";
+import {handleError} from "../http-common";
+import config from "../config";
 
 export async function createProfesor(data) {
     try {
@@ -29,7 +31,10 @@ export async function updateProfesor(id,data) {
 
 export const retrieveProfesores = () => async (dispatch) => {
     try {
-        const res = await ProfesoresService.getAll();
+        const res = await ProfesoresService.getAll().catch(err => {
+            console.log(err)
+            handleError(err,`${config.appDns}/profesores`,"Hubo un error al eliminar el profesor")
+        });
         dispatch({
             type: RETRIEVE_PROFESORES,
             payload: res.data,
@@ -48,22 +53,7 @@ export async function deleteProfesor(id){
     } catch (err) {
         return Promise.reject(err);
     }
-};
-
-//   export const deleteAllTutorials = () => async (dispatch) => {
-//     try {
-//       const res = await TutorialDataService.deleteAll();
-
-//       dispatch({
-//         type: DELETE_ALL_TUTORIALS,
-//         payload: res.data,
-//       });
-
-//       return Promise.resolve(res.data);
-//     } catch (err) {
-//       return Promise.reject(err);
-//     }
-//   };
+}
 
 //   export const findTutorialsByTitle = (title) => async (dispatch) => {
 //     try {

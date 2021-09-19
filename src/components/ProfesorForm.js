@@ -3,10 +3,11 @@ import {createProfesor, updateProfesor} from "../actions/profesores";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import {handleResponse} from "../http-common";
+import {handleError, handleResponse} from "../http-common";
 import config from "../config"
 import ProfesoresService from "../services/ProfesoresService";
 import swal from '@sweetalert/with-react';
+import  validDateRegex from '../commons/commons'
 
 
 const validationSchema = Yup.object().shape({
@@ -18,11 +19,11 @@ const validationSchema = Yup.object().shape({
       .required('DNI es requerido')
       .integer('El DNI debe ser un número')
       .positive('El DNI debe ser un numero válido'),
-  edad: Yup.number()
-      .typeError('La edad debe ser un número')
-      .required('La edad es requerida')
-      .integer("La edad debe ser un número")
-      .positive('La edad debe ser un numero válido'),
+
+  fechaDeNacimiento: Yup.string()
+      .required('La fecha de nacimiento es requerida')
+      .matches(validDateRegex,{message: 'La fecha de nacimiento debe tener el formato dd/mm/yyyy'}),
+
 
   email: Yup.string()
       .required('El email es requerido')
@@ -52,8 +53,6 @@ function ProfesorForm(props){
 
   const id = props && props.props ? props.props.params.id : undefined
 
-  // const [state, setState] = useState([])
-
   const {
     register,
     handleSubmit,
@@ -64,7 +63,7 @@ function ProfesorForm(props){
     defaultValues: {
       nombreApellido:"",
       dni:"",
-      edad:"",
+      fechaDeNacimiento:"",
       detalles:"",
       cbuCvu:"",
       experienciaPrevia:"",
@@ -83,7 +82,7 @@ function ProfesorForm(props){
             } else {
               swal({
                 title: "Error",
-                text: 'Un error ocurrió al buscar el profesor requerido. Por favor verifica que el mismo exista o contacta al administrador.',
+                text: 'Un error ocurrió al buscar el profesor requerido. Por favor verificá que el mismo exista o contacta al administrador.',
                 icon: "error",
                 button: "OK"
               }).then(() => {
@@ -98,11 +97,17 @@ function ProfesorForm(props){
   const onSubmit = (data) => {
     if(id){
       updateProfesor(id,data).then((response) => {
-        handleResponse(200,response,navigateProfesores,"Hubo un error al actualizar el profesor", "El profesor fue correctamente actualizado.")
+        handleResponse(200,response,navigateProfesores, "El profesor fue correctamente actualizado.")
+      }).catch(err => {
+        console.log(err)
+        handleError(err,navigateProfesores,"Hubo un error al actualizar el profesor")
       })
     } else {
       createProfesor(data).then((response) => {
-        handleResponse(200,response,navigateProfesores,"Hubo un error al agregar el profesor", "El profesor fue correctamente dado de alta.")
+        handleResponse(200,response,navigateProfesores, "El profesor fue correctamente dado de alta.")
+      }).catch(err => {
+        console.log(err)
+        handleError(err,navigateProfesores,"Hubo un error al agregar el profesor")
       })
     }
   };
@@ -135,12 +140,12 @@ function ProfesorForm(props){
             <div className="form-group">
               <label>Edad</label>
               <input
-                  name="edad"
+                  name="fechaDeNacimiento"
                   type="text"
-                  {...register('edad')}
-                  className={`form-control ${errors.edad ? 'is-invalid' : ''}`}
+                  {...register('fechaDeNacimiento')}
+                  className={`form-control ${errors.fechaDeNacimiento ? 'is-invalid' : ''}`}
               />
-              <div className="invalid-feedback">{errors.edad?.message}</div>
+              <div className="invalid-feedback">{errors.fechaDeNacimiento?.message}</div>
             </div>
 
             <div className="form-group">

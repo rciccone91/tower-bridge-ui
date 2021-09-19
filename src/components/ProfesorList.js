@@ -10,12 +10,13 @@ import {
 
 import {
   retrieveProfesores,
+  getProfesores
 } from "../actions/profesores";
 import { Link } from "react-router-dom";
-import {handleResponse} from "../http-common";
+import {handleError, handleResponse} from "../http-common";
 import config from "../config";
 
-const navigateDeleteOk = `${config.appDns}/profesores`
+const navigateDeleteOkOrError = `${config.appDns}/profesores`
 
 class ProfesoresList extends Component {
 
@@ -26,7 +27,6 @@ class ProfesoresList extends Component {
     this.refreshData = this.refreshData.bind(this);
     this.setActiveProfesor = this.setActiveProfesor.bind(this);
     this.findByTitle = this.findByTitle.bind(this);
-    // this.onCancel = this.onCancel.bind(this);
     this.showConfirmation = this.showConfirmation.bind(this);
 
     this.state = {
@@ -73,7 +73,10 @@ class ProfesoresList extends Component {
 
   deleteProfesor(id){
     deleteProfesor(id).then((response) => {
-      handleResponse(204,response,navigateDeleteOk,"Hubo un error al eliminar el profesor", "El profesor fue correctamente eliminado.")
+      handleResponse(204,response,navigateDeleteOkOrError,"El profesor fue correctamente eliminado.")
+    }).catch(err => {
+      console.log(err)
+      handleError(err,navigateDeleteOkOrError,"Hubo un error al eliminar el profesor")
     })
   };
 
@@ -88,7 +91,7 @@ class ProfesoresList extends Component {
     const { profesores } = this.props;
 
     return (
-      <div className="list row">
+      <div className="list row col-md-12" >
         {/*<div className="col-md-8">*/}
         {/*  <div className="input-group mb-3">*/}
         {/*    <input*/}
@@ -196,10 +199,17 @@ class ProfesoresList extends Component {
                         }
                       })
                     }
-                    style={{marginLeft:20}}
+                    style={{marginLeft:10}}
                 >
                   Eliminar
                 </button>
+              <Link
+                    to={"/profesor/detail/" + currentProfesor.id}
+                    className="btn btn-info btn-sm"
+                    style={{marginLeft:10}}
+                >
+                  Ver
+                </Link>
             </div>
           ) : (
             <div>
