@@ -7,6 +7,7 @@ import ProfesorForm from "./components/ProfesorForm";
 import ProfesoresList from "./components/ProfesorList";
 import ProfesorDetail from "./components/ProfesorDetail";
 import Home from "./components/Home";
+import PadresList from "./components/PadreList";
 
 class App extends Component {
   render() {
@@ -22,6 +23,11 @@ class App extends Component {
                 Profesores
               </Link>
             </li>
+            <li className="nav-item">
+              <Link to={"/padres"} className="nav-link">
+                Padres
+              </Link>
+            </li>
           </div>
         </nav>
 
@@ -29,6 +35,7 @@ class App extends Component {
           <Switch>
             <Route exact path={["/","/home"]} render={(props) => <Home props={props}/>} />
             <Route exact path={"/profesores"} component={ProfesoresList} />
+            <Route exact path={"/padres"} component={PadresList} />
             <Route path="/profesores/:id" render={(props) => <ProfesorForm props={props.match}/>} />
             <Route path="/profesorForm" component={ProfesorForm}/>
             <Route path="/profesor/detail/:id" render={(props) => <ProfesorDetail props={props.match}/>}/>

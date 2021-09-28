@@ -50,6 +50,11 @@ function ProfesorDetail(props){
                 <label>{data.cbuCvu}</label>
                 <h5>Valor de hora diferenciado</h5>
                 <label>{data.valorHoraDiferenciado ? 'Si' : 'No'}</label>
+                <h5>Clases asignadas</h5>
+                {data.clases &&
+                data.clases.map((clase, index) => (
+                    <label>{clase}</label>
+                ))}
             </div>
             <div className="col-md-6">
 

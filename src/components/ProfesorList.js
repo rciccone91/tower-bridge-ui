@@ -62,15 +62,6 @@ class ProfesoresList extends Component {
     });
   }
 
-  showConfirmation(){
-    swal({
-      title: "Eliminar",
-      text: "Se va a eliminar el profesor "+this.props.currentProfesor.nombreApellido+". Por favor, confirmar dicha acción.",
-      icon: "warning",
-      buttons: ["Cancelar", "Eliminar"]
-    });
-  };
-
   deleteProfesor(id){
     deleteProfesor(id).then((response) => {
       handleResponse(204,response,navigateDeleteOkOrError,"El profesor fue correctamente eliminado.")

@@ -104,7 +104,7 @@ function ProfesorForm(props){
       })
     } else {
       createProfesor(data).then((response) => {
-        handleResponse(200,response,navigateProfesores, "El profesor fue correctamente dado de alta.")
+        handleResponse(201,response,navigateProfesores, "El profesor fue correctamente dado de alta.")
       }).catch(err => {
         console.log(err)
         handleError(err,navigateProfesores,"Hubo un error al agregar el profesor")
@@ -138,7 +138,7 @@ function ProfesorForm(props){
             </div>
 
             <div className="form-group">
-              <label>Edad</label>
+              <label>Fecha de Nacimiento</label>
               <input
                   name="fechaDeNacimiento"
                   type="text"
