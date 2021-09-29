@@ -1,17 +1,7 @@
 import http from "../http-common";
+import { executeWithCatch } from "../http-common";
 
 class ProfesoresService {
-
-    executeWithCatch(request){
-        return request.catch(error => {
-            if (!error.response) {
-                console.log(error.stack)
-                return Promise.reject();
-            } else {
-                return Promise.reject(error.response);
-            }
-        });
-    }
 
     getAll() {
         return http.get("/profesores").catch(error => {
@@ -25,19 +15,19 @@ class ProfesoresService {
     }
 
     get(id) {
-        return this.executeWithCatch(http.get(`/profesores/${id}`))
+        return executeWithCatch(http.get(`/profesores/${id}`))
     }
 
     create(data) {
-        return this.executeWithCatch(http.post("/profesores", data))
+        return executeWithCatch(http.post("/profesores", data))
     }
 
     update(id, data) {
-        return this.executeWithCatch(http.patch(`/profesores/${id}`, data))
+        return executeWithCatch(http.patch(`/profesores/${id}`, data))
     }
 
     delete(id) {
-        return this.executeWithCatch(http.delete(`/profesores/${id}`))
+        return executeWithCatch(http.delete(`/profesores/${id}`))
     }
 
 //   findByTitle(title) {

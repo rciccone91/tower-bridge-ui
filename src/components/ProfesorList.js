@@ -27,7 +27,6 @@ class ProfesoresList extends Component {
     this.refreshData = this.refreshData.bind(this);
     this.setActiveProfesor = this.setActiveProfesor.bind(this);
     this.findByTitle = this.findByTitle.bind(this);
-    this.showConfirmation = this.showConfirmation.bind(this);
 
     this.state = {
       currentProfesor: null,

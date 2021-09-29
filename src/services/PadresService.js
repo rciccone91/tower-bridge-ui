@@ -1,4 +1,6 @@
 import http from "../http-common";
+import { executeWithCatch } from "../http-common";
+
 
 class PadresService {
 
@@ -11,6 +13,22 @@ class PadresService {
                 return Promise.reject(error.response);
             }
         });
+    }
+
+    get(id) {
+        return executeWithCatch(http.get(`/padres/${id}`))
+    }
+
+    create(data) {
+        return executeWithCatch(http.post("/padres", data))
+    }
+
+    update(id, data) {
+        return executeWithCatch(http.patch(`/padres/${id}`, data))
+    }
+
+    delete(id) {
+        return executeWithCatch(http.delete(`/padres/${id}`))
     }
 
 }

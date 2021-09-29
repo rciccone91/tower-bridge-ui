@@ -50,3 +50,14 @@ function showError(navigate){
     window.location = navigate
   })
 }
+
+export function executeWithCatch(request){
+  return request.catch(error => {
+    if (!error.response) {
+      console.log(error.stack)
+      return Promise.reject();
+    } else {
+      return Promise.reject(error.response);
+    }
+  });
+}

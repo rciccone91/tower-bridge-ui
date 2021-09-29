@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
-import {createProfesor, updateProfesor} from "../actions/profesores";
+import {createPadre, updatePadre} from "../actions/padres";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import {handleError, handleResponse} from "../http-common";
 import config from "../config"
-import ProfesoresService from "../services/ProfesoresService";
+import PadresService from "../services/PadresService";
 import swal from '@sweetalert/with-react';
-import  validDateRegex from '../commons/commons'
 
 
 const validationSchema = Yup.object().shape({
@@ -21,22 +20,9 @@ const validationSchema = Yup.object().shape({
       .integer('El DNI debe ser un número')
       .positive('El DNI debe ser un numero válido'),
 
-  fechaDeNacimiento: Yup.string()
-      .required('La fecha de nacimiento es requerida')
-      .matches(validDateRegex,{message: 'La fecha de nacimiento debe tener el formato dd/mm/yyyy'}),
-
-
   email: Yup.string()
       .required('El email es requerido')
       .email('El email es invalido'),
-
-  cbuCvu: Yup.string()
-      .required('El CBU / CVU es requerido')
-      .matches('^(?!\\s*$).+',{message: 'El CBU / CVU no puede estar vacío'}),
-
-  experienciaPrevia: Yup.string()
-      .required('Los datos de experiencia previa son requeridos')
-      .matches('^(?!\\s*$).+',{message: 'Los datos de experiencia previa no pueden estar vacío'}),
 
   domicilio: Yup.string()
       .required('El domicilio es requerido.')
@@ -48,9 +34,9 @@ const validationSchema = Yup.object().shape({
 
 });
 
-const navigateProfesores = `${config.appDns}/profesores`
+const navigatePadres = `${config.appDns}/padres`
 
-function ProfesorForm(props){
+function PadreForm(props){
 
   const id = props && props.props ? props.props.params.id : undefined
 
@@ -64,11 +50,7 @@ function ProfesorForm(props){
     defaultValues: {
       nombreApellido:"",
       dni:"",
-      fechaDeNacimiento:"",
       detalles:"",
-      cbuCvu:"",
-      experienciaPrevia:"",
-      valorHoraDiferenciado:false,
       domicilio:"",
       telefono:"",
       email:""
@@ -76,38 +58,38 @@ function ProfesorForm(props){
 
   useEffect(() => {
     if(id){
-      ProfesoresService.get(id).then(
+      PadresService.get(id).then(
           res =>  {
               reset(res.data)
           }).catch(err => {
             console.log(err)
             swal({
               title: "Error",
-              text: 'Un error ocurrió al buscar el profesor requerido. Por favor verificá que el mismo exista o contacta al administrador.',
+              text: 'Un error ocurrió al buscar el padre requerido. Por favor verificá que el mismo exista o contacta al administrador.',
               icon: "error",
               button: "OK"
             }).then(() => {
-              window.location = navigateProfesores
+              window.location = navigatePadres
             })
-        });
+      });
     }
   },[id,reset])
 
 
   const onSubmit = (data) => {
     if(id){
-      updateProfesor(id,data).then((response) => {
-        handleResponse(200,response,navigateProfesores, "El profesor fue correctamente actualizado.")
+      updatePadre(id,data).then((response) => {
+        handleResponse(200,response,navigatePadres, "El padre fue correctamente actualizado.")
       }).catch(err => {
         console.log(err)
-        handleError(err,navigateProfesores,"Hubo un error al actualizar el profesor")
+        handleError(err,navigatePadres,"Hubo un error al actualizar el padre")
       })
     } else {
-      createProfesor(data).then((response) => {
-        handleResponse(201,response,navigateProfesores, "El profesor fue correctamente dado de alta.")
+      createPadre(data).then((response) => {
+        handleResponse(201,response,navigatePadres, "El padre fue correctamente dado de alta.")
       }).catch(err => {
         console.log(err)
-        handleError(err,navigateProfesores,"Hubo un error al agregar el profesor")
+        handleError(err,navigatePadres,"Hubo un error al agregar el padre")
       })
     }
   };
@@ -138,17 +120,6 @@ function ProfesorForm(props){
             </div>
 
             <div className="form-group">
-              <label>Fecha de Nacimiento</label>
-              <input
-                  name="fechaDeNacimiento"
-                  type="text"
-                  {...register('fechaDeNacimiento')}
-                  className={`form-control ${errors.fechaDeNacimiento ? 'is-invalid' : ''}`}
-              />
-              <div className="invalid-feedback">{errors.fechaDeNacimiento?.message}</div>
-            </div>
-
-            <div className="form-group">
               <label>Detalles</label>
               <input
                   name="detalles"
@@ -157,44 +128,6 @@ function ProfesorForm(props){
                   className={`form-control ${errors.detalles ? 'is-invalid' : ''}`}
               />
               <div className="invalid-feedback">{errors.detalles?.message}</div>
-            </div>
-
-
-            <div className="form-group">
-              <label>CBU / CVU</label>
-              <input
-                  name="cbuCvu"
-                  type="text"
-                  {...register('cbuCvu')}
-                  className={`form-control ${errors.cbuCvu ? 'is-invalid' : ''}`}
-              />
-              <div className="invalid-feedback">{errors.cbuCvu?.message}</div>
-            </div>
-
-            <div className="form-group">
-              <label>Experiencia previa </label>
-              <input
-                  name="experienciaPrevia"
-                  type="text"
-                  {...register('experienciaPrevia')}
-                  className={`form-control ${errors.experienciaPrevia ? 'is-invalid' : ''}`}
-              />
-              <div className="invalid-feedback">{errors.experienciaPrevia?.message}</div>
-            </div>
-
-            <div className="form-group form-check">
-              <input
-                  name="valorHoraDiferenciado"
-                  type="checkbox"
-                  {...register('valorHoraDiferenciado')}
-                  className={`form-check-input ${
-                      errors.valorHoraDiferenciado ? 'is-invalid' : ''
-                  }`}
-              />
-              <label htmlFor="acceptTerms" className="form-check-label">
-                Valor de hora diferenciado
-              </label>
-              <div className="invalid-feedback">{errors.valorHoraDiferenciado?.message}</div>
             </div>
 
             <div className="form-group">
@@ -239,4 +172,4 @@ function ProfesorForm(props){
         </div>);
 }
 
-export default ProfesorForm
+export default PadreForm
