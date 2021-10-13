@@ -82,44 +82,6 @@ class ProfesoresList extends Component {
 
     return (
       <div className="list row col-md-12" >
-        {/*<div className="col-md-8">*/}
-        {/*  <div className="input-group mb-3">*/}
-        {/*    <input*/}
-        {/*      type="text"*/}
-        {/*      className="form-control"*/}
-        {/*      placeholder="Buscar por Nombre"*/}
-        {/*      value={searchTitle}*/}
-        {/*      onChange={this.onChangeSearchTitle}*/}
-        {/*    />*/}
-        {/*    <div className="input-group-append">*/}
-        {/*      <button*/}
-        {/*        className="btn btn-outline-secondary"*/}
-        {/*        type="button"*/}
-        {/*        onClick={this.findByTitle}*/}
-        {/*      >*/}
-        {/*        Search*/}
-        {/*      </button>*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*  <div className="input-group mb-3">*/}
-        {/*    <input*/}
-        {/*        type="text"*/}
-        {/*        className="form-control"*/}
-        {/*        placeholder="Buscar por curso"*/}
-        {/*        value={searchTitle}*/}
-        {/*        onChange={this.onChangeSearchTitle}*/}
-        {/*    />*/}
-        {/*    <div className="input-group-append">*/}
-        {/*      <button*/}
-        {/*          className="btn btn-outline-secondary"*/}
-        {/*          type="button"*/}
-        {/*          onClick={this.findByTitle}*/}
-        {/*      >*/}
-        {/*        Search*/}
-        {/*      </button>*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
         <div className="col-md-6">
           <h4>Profesores</h4>
 

@@ -15,6 +15,17 @@ class PadresService {
         });
     }
 
+    getAllForSelect() {
+        return http.get("/all-padres").catch(error => {
+            if (!error.response) {
+                console.log(error.stack)
+                return Promise.reject();
+            } else {
+                return Promise.reject(error.response);
+            }
+        });
+    }
+
     get(id) {
         return executeWithCatch(http.get(`/padres/${id}`))
     }

@@ -10,6 +10,9 @@ import ProfesorDetail from "./components/ProfesorDetail";
 import Home from "./components/Home";
 import PadresList from "./components/PadreList";
 import PadreDetail from "./components/PadreDetail";
+import AlumnosList from "./components/AlumnoList";
+import AlumnoForm from "./components/AlumnoForm";
+import AlumnoDetail from "./components/AlumnoDetail";
 
 class App extends Component {
   render() {
@@ -30,20 +33,32 @@ class App extends Component {
                 Padres
               </Link>
             </li>
+            <li className="nav-item">
+              <Link to={"/alumnos"} className="nav-link">
+                Alumnos
+              </Link>
+            </li>
           </div>
         </nav>
 
         <div className="container mt-3">
           <Switch>
             <Route exact path={["/","/home"]} render={(props) => <Home props={props}/>} />
+
             <Route exact path={"/profesores"} component={ProfesoresList} />
             <Route path="/profesores/:id" render={(props) => <ProfesorForm props={props.match}/>} />
             <Route path="/profesorForm" component={ProfesorForm}/>
             <Route path="/profesor/detail/:id" render={(props) => <ProfesorDetail props={props.match}/>}/>
+
             <Route exact path={"/padres"} component={PadresList} />
             <Route path="/padres/:id" render={(props) => <PadreForm props={props.match}/>} />
             <Route path="/padreForm" component={PadreForm}/>
             <Route path="/padre/detail/:id" render={(props) => <PadreDetail props={props.match}/>}/>
+
+            <Route exact path={"/alumnos"} component={AlumnosList} />
+            <Route path="/alumnos/:id" render={(props) => <AlumnoForm props={props.match}/>} />
+            <Route path="/alumnoForm" component={AlumnoForm}/>
+            <Route path="/alumno/detail/:id" render={(props) => <AlumnoDetail props={props.match}/>}/>
           </Switch>
         </div>
       </Router>
