@@ -2,11 +2,11 @@ import React, { useState, useEffect }from "react";
 import swal from '@sweetalert/with-react';
 import Pagination from "@material-ui/lab/Pagination";
 
-import { getPadres, deletePadre } from "../actions/padres";
+import { getPadres, deletePadre } from "../../actions/padres";
 
 import { Link } from "react-router-dom";
-import {handleError, handleResponse} from "../http-common";
-import config from "../config";
+import {handleError, handleResponse} from "../../http-common";
+import config from "../../config";
 
 const navigateDeleteOkOrError = `${config.appDns}/padres`
 

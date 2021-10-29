@@ -3,8 +3,8 @@ import { executeWithCatch } from "../http-common";
 
 class ProfesoresService {
 
-    getAll() {
-        return http.get("/profesores").catch(error => {
+    getAll(params) {
+        return http.get("/profesores",{ params }).catch(error => {
             if (!error.response) {
                 console.log(error.stack)
                 return Promise.reject();
@@ -16,6 +16,10 @@ class ProfesoresService {
 
     get(id) {
         return executeWithCatch(http.get(`/profesores/${id}`))
+    }
+
+    getAllAAsignar() {
+        return executeWithCatch(http.get(`/profesores/a-asignar`))
     }
 
     create(data) {

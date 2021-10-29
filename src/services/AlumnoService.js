@@ -4,6 +4,10 @@ import { executeWithCatch } from "../http-common";
 
 class AlumnoService {
 
+    getAllAAsignar(){
+        return executeWithCatch(http.get(`/alumnos/a-asignar`))
+    }
+
     getAll(params) {
         return http.get("/alumnos", { params }).catch(error => {
             if (!error.response) {

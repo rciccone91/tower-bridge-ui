@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import config from "../config"
-import AlumnoService from "../services/AlumnoService";
+import config from "../../config"
+import AlumnoService from "../../services/AlumnoService";
 import swal from '@sweetalert/with-react';
 
 function AlumnoDetail(props){

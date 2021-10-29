@@ -4,6 +4,18 @@ import ProfesoresService from "../services/ProfesoresService";
 import {handleError} from "../http-common";
 import config from "../config";
 
+export async function getProfesores(params) {
+    try {
+        console.log("estoy en getProfesores")
+        const res = await ProfesoresService.getAll(params);
+
+        return Promise.resolve(res);
+    } catch (err) {
+        return Promise.reject(err);
+    }
+}
+
+
 export async function createProfesor(data) {
     try {
         console.log("estoy en createProfesor")

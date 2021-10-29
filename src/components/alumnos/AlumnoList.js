@@ -2,11 +2,11 @@ import React, { useState, useEffect }from "react";
 import swal from '@sweetalert/with-react';
 import Pagination from "@material-ui/lab/Pagination";
 
-import { getAlumnos, deleteAlumno } from "../actions/alumnos";
+import { getAlumnos, deleteAlumno } from "../../actions/alumnos";
 
 import { Link } from "react-router-dom";
-import {handleError, handleResponse} from "../http-common";
-import config from "../config";
+import {handleError, handleResponse} from "../../http-common";
+import config from "../../config";
 
 const navigateDeleteOkOrError = `${config.appDns}/alumnos`
 

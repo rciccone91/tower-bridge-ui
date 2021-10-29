@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {createAlumno, updateAlumno} from "../actions/alumnos";
+import {createAlumno, updateAlumno} from "../../actions/alumnos";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import {handleError, handleResponse} from "../http-common";
-import config from "../config"
-import AlumnoService from "../services/AlumnoService";
+import {handleError, handleResponse} from "../../http-common";
+import config from "../../config"
+import AlumnoService from "../../services/AlumnoService";
 import swal from '@sweetalert/with-react';
-import validDateRegex from "../commons/commons";
+import validDateRegex from "../../commons/commons";
+import UsuariosService from "../../services/UsuariosService";
 
 
 
@@ -49,6 +50,8 @@ const validationSchema = Yup.object().shape({
       .required('Los datos sobre las instituciones previas son requeridos.')
       .matches('^(?!\\s*$).+',{message: 'Este campo no puede estar vacío'}),
 
+  usuarioId: Yup.number().min(1, 'Se debe seleccionar una opción'),
+
 });
 
 const navigateAlumnos = `${config.appDns}/alumnos`
@@ -56,17 +59,10 @@ const navigateAlumnos = `${config.appDns}/alumnos`
 function AlumnoForm(props){
 
   const id = props && props.props ? props.props.params.id : undefined
-  // const options = PadresService.getAllForSelect(id).then(
-  //     res =>  {
-  //      Promise.resolve(() -> { return res.data.map(function (padre) {
-  //        return { value: padre.id, label: padre.nombreApellido };
-  //      })
-  //     }));
+  const [usuarios, setUsuarios] = useState([]);
 
-  const handleCategoryInputChange = newValue => {
-    // return setValue('businessCategory', newValue, true);
-  };
 
+  //TODO - falta selección de padres / tutores
   const {
     register,
     handleSubmit,
@@ -85,15 +81,32 @@ function AlumnoForm(props){
       detalles:"",
       rindeExamen: false,
       padresACargo: undefined,
-      usuario: undefined,
+      usuarioId: undefined,
       domicilio:"",
       telefono:"",
       email:""
     }});
 
-  const [selectedOption, setSelectedOption] = useState(null);
+
+  const retrieveUsuarios = () => {
+    UsuariosService.getAllAAsignar('ALUMNO').then(
+        res =>  {
+          setUsuarios(res.data)
+        }).catch(err => {
+      console.log(err)
+      swal({
+        title: "Error",
+        text: 'Un error ocurrió al buscar los usuarios a asignar. Por favor contacta al administrador.',
+        icon: "error",
+        button: "OK"
+      }).then(() => {
+        window.location = navigateAlumnos
+      })
+    });
+  };
 
   useEffect(() => {
+    retrieveUsuarios();
     if(id){
       AlumnoService.get(id).then(
           res =>  {
@@ -130,6 +143,10 @@ function AlumnoForm(props){
       })
     }
   };
+
+  function usuariosOptions() {
+    return usuarios.map( u => <option value={u.id}>{u.username}</option>)
+  }
 
     return (
         <div className="register-form">
@@ -280,6 +297,18 @@ function AlumnoForm(props){
                   className={`form-control ${errors.email ? 'is-invalid' : ''}`}
               />
               <div className="invalid-feedback">{errors.email?.message}</div>
+            </div>
+
+            <div className="form-group">
+              <label>Usuario</label>
+              <select
+                  name="usuarioId"
+                  {...register('usuarioId')}
+                  className={`form-control ${errors.usuarioId ? 'is-invalid' : ''}`}>
+                <option value="0" selected disabled hidden>Seleccione un usuario a asignar</option>
+                {usuariosOptions()}
+              </select>
+              <div className="invalid-feedback">{errors.usuarioId?.message}</div>
             </div>
 
             <div className="form-group">
