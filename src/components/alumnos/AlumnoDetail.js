@@ -67,7 +67,7 @@ function AlumnoDetail(props){
                 <h5>Padres / Tutores</h5>
                 {data.padres &&
                 data.padres.map((padre) => (
-                    <label>{padre}</label>
+                    <label>{padre.nombre + " - Contacto: "+ padre.telefono}</label>
                 ))}
             </div>
             <div className="col-md-4">

@@ -12,6 +12,31 @@ import Loader from "react-loader-spinner";
 import UsuariosService from "../../services/UsuariosService";
 
 
+Yup.addMethod(Yup.string, "edadMinima", function (errorMessage) {
+  return this.test(`fechaDeNacimiento`, errorMessage, function (value) {
+    let anio = value.split('/')[2];
+    let anioActual = new Date().getFullYear();
+    return anio && (anioActual - parseInt(anio, 10)) >= 18 ;
+  });
+});
+
+Yup.addMethod(Yup.string, "edadMaxima", function (errorMessage) {
+  return this.test(`fechaDeNacimiento`, errorMessage, function (value) {
+    let anio = value.split('/')[2];
+    let anioActual = new Date().getFullYear();
+    return anio && (anioActual - parseInt(anio, 10)) <= 65 ;
+  });
+});
+
+Yup.addMethod(Yup.string, "anioValido", function (errorMessage) {
+  return this.test(`fechaDeNacimiento`, errorMessage, function (value) {
+    let anio = value.split('/')[2];
+    let anioActual = new Date().getFullYear();
+    return parseInt(anio, 10) < anioActual;
+  });
+});
+
+
 const validationSchema = Yup.object().shape({
   nombreApellido: Yup.string()
       .required('El nombre y apellido es requerido')
@@ -25,7 +50,10 @@ const validationSchema = Yup.object().shape({
 
   fechaDeNacimiento: Yup.string()
       .required('La fecha de nacimiento es requerida')
-      .matches(validDateRegex,{message: 'La fecha de nacimiento debe tener el formato dd/mm/yyyy'}),
+      .matches(validDateRegex,{message: 'La fecha de nacimiento debe tener el formato dd/mm/yyyy'})
+      .anioValido("Fecha de nacimiento incorrecta. Verificar el año ingresado")
+      .edadMinima("Fecha de nacimiento incorrecta. La edad mínima permitida es de 18 años.")
+      .edadMaxima("Fecha de nacimiento incorrecta. La edad máxima permitida es de 65 años."),
 
 
   email: Yup.string()
@@ -48,7 +76,10 @@ const validationSchema = Yup.object().shape({
       .required('El teléfono es requerido.')
       .matches('^(?!\\s*$).+',{message: 'El teléfono no puede estar vacío'}),
 
-  usuarioId: Yup.number().min(1, 'Se debe seleccionar una opción'),
+  usuarioId: Yup.number()
+      .typeError('El usuario es requerido. Por favor, cree un nuevo usuario si el mismo no existe.')
+      .required('El usuario es requerido. Por favor, cree un nuevo usuario si el mismo no existe.')
+      .min(1, 'Se debe seleccionar una opción'),
 
 });
 

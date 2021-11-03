@@ -35,6 +35,10 @@ class UsuariosService {
         return executeWithCatch(http.delete(`/usuarios/${id}`))
     }
 
+    login(data){
+        return executeWithCatch(http.post(`/login`,data))
+    }
+
 }
 
 export default new UsuariosService();

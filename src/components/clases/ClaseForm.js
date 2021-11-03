@@ -1,7 +1,8 @@
 import React, {useEffect, useState, us} from "react";
 import {createClase, getClases, updateClase} from "../../actions/clases";
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import {useForm} from 'react-hook-form';
+import {yupResolver} from '@hookform/resolvers/yup';
+import Loader from "react-loader-spinner";
 import * as Yup from 'yup';
 import {handleError, handleResponse} from "../../http-common";
 import config from "../../config"
@@ -15,75 +16,64 @@ import CursosService from "../../services/CursosService";
 const validationSchema = Yup.object().shape({
     nombre: Yup.string()
         .required('El nombre de la clase es requerido')
-        .matches('^(?!\\s*$).+',{message: 'El nombre de la clase no puede estar vacío'}),
+        .matches('^(?!\\s*$).+', {message: 'El nombre de la clase no puede estar vacío'}),
 
-    curso: Yup.number().min(1, 'Se debe seleccionar una opción'),
-    profesorId: Yup.number().min(1, 'Se debe seleccionar una opción'),
+    curso: Yup.number()
+        .typeError('Se debe seleccionar una opción')
+        .required('Se debe seleccionar una opción')
+        .min(1, 'Se debe seleccionar una opción'),
+
+    profesorId: Yup.number()
+        .typeError('Se debe seleccionar una opción')
+        .required('Se debe seleccionar una opción')
+        .min(1, 'Se debe seleccionar una opción'),
+
     alumnosIds: Yup.array().ensure().min(1, 'Se debe seleccionar un alumno').max(6, "La cantidad de alumnos debe ser menor o igual a 6."),
-
-    // horarioInicio: Yup.number()
-    //     .typeError('El horario de inicio debe ser un número')
-    //     .required('El horario de inicio es requerido')
-    //     // .oneOf(9,10,11,12,13,14,15,16,17,18,19)
-    //     // .min(9, 'El horario de inicio de la clase no puede ser antes de las 9hs')
-    //     .max(19, 'El horario de inicio de la clase no puede ser mayor a 19hs')
-    //     .integer('El horario de inicio debe ser un número')
-    //     .positive('El horario de inicio debe ser un numero válido'),
-
-    // horarioFin: Yup.number()
-    //     .typeError('El horario de fin debe ser un número').min(10, 'Errooooooor')
-    //     .required('El horario de fin es requerido')
-    //     // .oneOf(10,11,12,13,14,15,16,17,18,19,20,21)
-    //     .max(21, 'El horario de fin de la clase no puede ser mayor a 21hs')
-    //     .moreThan(9)
-    //     .integer('El horario de fin debe ser un número')
-    //     .positive('El horario de fin debe ser un numero válido'),
 
     linkVideollamada: Yup.string()
         .required('El link de la videollamada de la clase es requerido')
-        .matches('^(?!\\s*$).+',{message: 'El link de la videollamada de la clase no estar vacío'}),
+        .matches('^(?!\\s*$).+', {message: 'El link de la videollamada de la clase no estar vacío'}),
 
     claveVideollamada: Yup.string()
         .required('La clave de la videollamada de la clase es requerida')
-        .matches('^(?!\\s*$).+',{message: 'La clave de la videollamada de la clase no puede estar vacía'}),
+        .matches('^(?!\\s*$).+', {message: 'La clave de la videollamada de la clase no puede estar vacía'}),
 
     linkClassroom: Yup.string()
         .required('El link del classroom de la clase es requerido')
-        .matches('^(?!\\s*$).+',{message: 'El link del classroom de la clase no estar vacío'}),
+        .matches('^(?!\\s*$).+', {message: 'El link del classroom de la clase no estar vacío'}),
 
     claveClassroom: Yup.string()
         .required('La clave del classroom de la clase es requerida')
-        .matches('^(?!\\s*$).+',{message: 'La clave del classroom de la clase no puede estar vacía'}),
+        .matches('^(?!\\s*$).+', {message: 'La clave del classroom de la clase no puede estar vacía'}),
 
 });
 
 const navigateClases = `${config.appDns}/clases`
 
-function ClaseForm(props){
-
-    // TODO - Modificación
+function ClaseForm(props) {
 
     const id = props && props.props ? props.props.params.id : undefined
     const [profesores, setProfesores] = useState([]);
     const [alumnos, setAlumnos] = useState([]);
     const [cursos, setCursos] = useState([]);
-    const [selectCursoDefault, setSelectCursoDefault] = useState([]);
-    const [selectAlumnosDefault, setSelectAlumnosDefault] = useState([]);
-    const [selectProfesorDefault, setSelectProfesorDefault] = useState([]);
+    const [profesor, setProfesor] = useState();
+    const [selectedCurso, setSelectedCurso] = useState();
+    const [selectedAlumnos, setSelectedAlumnos] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
 
     const {
         register,
         handleSubmit,
         reset,
-        formState: { errors }
+        formState: {errors}
     } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
-            nombre:"",
+            nombre: "",
             curso: undefined,
-            descripcion:"",
-            dia:undefined,
+            descripcion: "",
+            dia: undefined,
             horarioInicio: undefined,
             horarioFin: undefined,
             linkVideollamada: "",
@@ -92,11 +82,12 @@ function ClaseForm(props){
             claveClassroom: "",
             alumnosIds: undefined,
             profesorId: undefined,
-        }});
+        }
+    });
 
     const retrievePrfesores = () => {
         ProfesoresService.getAllAAsignar().then(
-            res =>  {
+            res => {
                 setProfesores(res.data)
             }).catch(err => {
             console.log(err)
@@ -114,7 +105,7 @@ function ClaseForm(props){
 
     const retrieveAlumnos = () => {
         AlumnoService.getAllAAsignar().then(
-            res =>  {
+            res => {
                 setAlumnos(res.data)
             }).catch(err => {
             console.log(err)
@@ -131,7 +122,7 @@ function ClaseForm(props){
 
     const retrieveCursos = () => {
         CursosService.getAllAAsignar().then(
-            res =>  {
+            res => {
                 setCursos(res.data)
             }).catch(err => {
             console.log(err)
@@ -150,10 +141,22 @@ function ClaseForm(props){
         retrievePrfesores();
         retrieveAlumnos();
         retrieveCursos();
-        if(id){
+        if (id) {
             ClasesService.get(id).then(
-                res =>  {
+                res => {
+                    if (res.data.curso) {
+                        console.log("en useEffect ")
+                        console.log(res.data.curso)
+                        setSelectedCurso(res.data.curso)
+                    }
+                    if (res.data.profesor) {
+                        setProfesor(res.data.profesor)
+                    }
+                    if (res.data.alumnos) {
+                        setSelectedAlumnos(res.data.alumnos)
+                    }
                     reset(res.data)
+                    setIsLoading(false)
                 }).catch(err => {
                 console.log(err)
                 swal({
@@ -166,61 +169,157 @@ function ClaseForm(props){
                 })
             });
         } else {
-            setSelectAlumnosDefault([])
-            setSelectCursoDefault([1])
-            setSelectProfesorDefault([1])
+            setIsLoading(false)
         }
-    },[id, reset])
+    }, [id, reset])
 
 
     const onSubmit = (data) => {
-        if(data.horarioFin <= data.horarioInicio){
+        if (data.horarioFin <= data.horarioInicio) {
             swal({
                 text: 'Horario incorrecto. El horario de finalización de la clase debe ser posterior al de inicio',
                 icon: "warning",
                 button: "OK"
             })
-        } else if((data.horarioFin - data.horarioInicio) > 4 ){
+        } else if ((data.horarioFin - data.horarioInicio) > 4) {
             swal({
                 text: 'Horario incorrecto. Las clases no deben extenderse mas allá de cuatros horas. ',
                 icon: "warning",
                 button: "OK"
             })
-        } else if(id){
-            updateClase(id,data).then((response) => {
-                handleResponse(200,response,navigateClases, "La clase fue correctamente actualizada.")
+        } else if ((data.horarioFin - data.horarioInicio) < 2) {
+            swal({
+                text: 'Horario incorrecto. Las clases deben al menos ser de 2 horas. ',
+                icon: "warning",
+                button: "OK"
+            })
+        } else if (id) {
+            updateClase(id, data).then((response) => {
+                handleResponse(200, response, navigateClases, "La clase fue correctamente actualizada.")
             }).catch(err => {
                 console.log(err)
-                handleError(err,navigateClases,"Hubo un error al actualizar la clase")
+                handleError(err, navigateClases, "Hubo un error al actualizar la clase")
             })
         } else {
             createClase(data).then((response) => {
-                handleResponse(201,response,navigateClases, "La clase fue correctamente dada de alta.")
+                handleResponse(201, response, navigateClases, "La clase fue correctamente dada de alta.")
             }).catch(err => {
                 console.log(err)
-                handleError(err,navigateClases,"Hubo un error al agregar la clase")
+                handleError(err, navigateClases, "Hubo un error al agregar la clase")
             })
         }
     };
 
     function profesoresOptions() {
-        return profesores.map( p => <option value={p.id}>{p.nombre}</option>)
+        return profesores.map(p => <option value={p.id}>{p.nombre}</option>)
     }
 
     function alumnosOptions() {
-        return alumnos.map( a =>  <option value={a.id}>{a.nombre}</option>)
+        return alumnos.map(a => <option value={a.id}>{a.nombre}</option>)
     }
 
     function cursosOptions() {
-        return cursos.map( c => <option value={c.id}>{c.nombre}</option>)
+        return cursos.map(c => <option value={c.id}>{c.nombre}</option>)
     }
 
-    // function getCursoSelected() {
-    //     return selectCursoDefault[0]
-    // }
+    function getProfesoresSelect() {
+        return profesor ?
+            <div className="form-group">
+                <label>Profesor</label>
+                <select
+                    name="profesorId"
+                    {...register('profesorId')}
+                    defaultValue={profesor.id}
+                    className={`form-control ${errors.profesorId ? 'is-invalid' : ''}`}>
+                    {profesoresOptions()}
+                </select>
+                <div className="invalid-feedback">{errors.profesorId?.message}</div>
+            </div>
+            : <div className="form-group">
+                <label>Profesor</label>
+                <select
+                    name="profesorId"
+                    {...register('profesorId')}
+                    className={`form-control ${errors.profesorId ? 'is-invalid' : ''}`}>
+                    <option value="0" selected disabled hidden>
+                        Seleccione un profesor
+                    </option>
+                    {profesoresOptions()}
+                </select>
+                <div className="invalid-feedback">{errors.profesorId?.message}</div>
+            </div>;
+    }
+
+    function getAlumnosSelect() {
+        let values = selectedAlumnos.map(sa => sa.id);
+        return selectedAlumnos ?
+            <div className="form-group">
+                <label>Alumnos</label>
+                <select
+                    multiple={true}
+                    defaultValue={values}
+                    name="alumnosIds"
+                    {...register('alumnosIds')}
+                    className={`form-control ${errors.alumnosIds ? 'is-invalid' : ''}`}>
+                    {alumnosOptions()}
+                </select>
+                <div className="invalid-feedback">{errors.alumnosIds?.message}</div>
+            </div>
+            :
+            <div className="form-group">
+                <label>Alumnos</label>
+                <select
+                    multiple={true}
+                    name="alumnosIds"
+                    {...register('alumnosIds')}
+                    className={`form-control ${errors.alumnosIds ? 'is-invalid' : ''}`}>
+                    {alumnosOptions()}
+                </select>
+                <div className="invalid-feedback">{errors.alumnosIds?.message}</div>
+            </div>;
+    }
+
+    function getCursosSelect() {
+        // TODO - porque no funciona el default value? Por cuestión de sanidad mental, lo voy a revisar mas adelante
+        // return selectedCurso ?
+        //     <div className="form-group">
+        //         <label>Curso</label>
+        //         <select
+        //             name="curso"
+        //             {...register('curso')}
+        //             defaultValue={selectedCurso.id}
+        //             className={`form-control ${errors.curso ? 'is-invalid' : ''}`}>
+        //             {cursosOptions()}
+        //         </select>
+        //         <div className="invalid-feedback">{errors.curso?.message}</div>
+        //     </div>
+        //     :
+        return <div className="form-group">
+            <label>Curso</label>
+            <select
+                name="curso"
+                {...register('curso')}
+                className={`form-control ${errors.curso ? 'is-invalid' : ''}`}>
+                <option value="0" selected disabled hidden>
+                    Seleccione un curso
+                </option>
+                {cursosOptions()}
+            </select>
+            <div className="invalid-feedback">{errors.curso?.message}</div>
+        </div>;
+    }
 
     return (
         <div className="register-form">
+            {isLoading && <Loader
+                type="Rings"
+                color="#00BFFF"
+                height={100}
+                width={100}
+                timeout={3000} //3 secs
+            />
+            }
+            {!isLoading &&
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="form-group">
                     <label>Nombre</label>
@@ -232,19 +331,7 @@ function ClaseForm(props){
                     />
                     <div className="invalid-feedback">{errors.nombre?.message}</div>
                 </div>
-                <div className="form-group">
-                    <label>Curso</label>
-                    <select
-                        name="curso"
-                        {...register('curso')}
-                        className={`form-control ${errors.curso ? 'is-invalid' : ''}`}>
-                        <option value="0" selected disabled hidden>
-                            Seleccione un curso</option>
-                        {cursosOptions()}
-                    </select>
-                    <div className="invalid-feedback">{errors.curso?.message}</div>
-                </div>
-
+                {getCursosSelect()}
                 <div className="form-group">
                     <label>Descripcion</label>
                     <input
@@ -360,29 +447,8 @@ function ClaseForm(props){
                     />
                     <div className="invalid-feedback">{errors.claveClassroom?.message}</div>
                 </div>
-                <div className="form-group">
-                    <label>Alumnos</label>
-                    <select
-                        multiple={true}
-                        name="alumnosIds"
-                        {...register('alumnosIds')}
-                        className={`form-control ${errors.alumnosIds ? 'is-invalid' : ''}`}>
-                        {alumnosOptions()}
-                    </select>
-                    <div className="invalid-feedback">{errors.alumnosIds?.message}</div>
-                </div>
-                <div className="form-group">
-                    <label>Profesor</label>
-                    <select
-                        name="profesorId"
-                        {...register('profesorId')}
-                        className={`form-control ${errors.profesorId ? 'is-invalid' : ''}`}>
-                        <option value="0" selected disabled hidden>
-                            Seleccione un profesor</option>
-                        {profesoresOptions()}
-                    </select>
-                    <div className="invalid-feedback">{errors.profesorId?.message}</div>
-                </div>
+                {getAlumnosSelect()}
+                {getProfesoresSelect()}
 
 
                 <div className="form-group">
@@ -391,6 +457,7 @@ function ClaseForm(props){
                     </button>
                 </div>
             </form>
+            }
         </div>);
 }
 

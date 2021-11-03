@@ -16,7 +16,7 @@ class PadresService {
     }
 
     getAllForSelect() {
-        return http.get("/all-padres").catch(error => {
+        return http.get("/padres/all").catch(error => {
             if (!error.response) {
                 console.log(error.stack)
                 return Promise.reject();

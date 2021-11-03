@@ -1,45 +1,34 @@
 import React, {useState, useEffect} from "react";
 import swal from '@sweetalert/with-react';
-import Pagination from "@material-ui/lab/Pagination";
-
-import {getPadres, deletePadre} from "../../actions/padres";
 
 import {Link} from "react-router-dom";
 import {handleError, handleResponse} from "../../http-common";
 import config from "../../config";
+import {deleteCurso, getCursos} from "../../actions/cursos";
+import Pagination from "@material-ui/lab/Pagination";
 
-const navigateDeleteOkOrError = `${config.appDns}/padres`
+const navigateDeleteOkOrError = `${config.appDns}/cursos`
 
-const PadresList = () => {
+const CursosList = (props) => {
 
-    const [padres, setPadres] = useState([]);
-    const [currentPadre, setCurrentPadre] = useState(null);
+    const consulta = props && props.props ? props.props.consulta : undefined
+    const [cursos, setCursos] = useState([]);
+    const [currentCurso, setCurrentCurso] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(-1);
-    const [searchNombreApellido, setSearchNombreApellido] = useState("");
-    const [searchAlumno, setSearchAlumno] = useState("");
+    const [searchNombre, setSearchNombre] = useState("");
+    const [searchTipo, setSearchTipo] = useState("");
     const [page, setPage] = useState(1);
     const [count, setCount] = useState(0);
 
 
-    const onChangeSearchNombreApellido = (e) => {
-        const searchNombreApellido = e.target.value;
-        setSearchNombreApellido(searchNombreApellido);
-    };
-
-    const onChangeSearchAlumno = (e) => {
-        const searchAlumno = e.target.value;
-        setSearchAlumno(searchAlumno);
-    };
-
-    const getRequestParams = (searchNombreApellido, searchAlumno, page) => {
+    const getRequestParams = (searchNombre, searchTipo) => {
         let params = {};
 
-        if (searchNombreApellido) {
-            params["nombreApellido"] = searchNombreApellido;
-        } else {
-            if (searchAlumno) {
-                params["alumno"] = searchAlumno;
-            }
+        if (searchNombre) {
+            params["nombre"] = searchNombre;
+        }
+        if (searchTipo) {
+            params["tipo"] = searchTipo;
         }
 
         if (page) {
@@ -49,92 +38,106 @@ const PadresList = () => {
         return params;
     };
 
-    const retrievePadres = () => {
-        const params = getRequestParams(searchNombreApellido, searchAlumno, page);
-        getPadres(params).then((response) => {
-            const {padres, totalPages} = response.data;
+    const retrieveCursos = () => {
+        const params = getRequestParams(searchNombre, searchTipo);
+        getCursos(params).then((response) => {
+            const {cursos, totalPages} = response.data;
 
-            setPadres(padres);
-            setCount(totalPages);
+            setCursos(cursos);
+            setCount(totalPages)
             setCurrentIndex(-1)
-            setCurrentPadre(null)
+            setCurrentCurso(null)
 
             console.log(response.data);
         }).catch(err => {
             console.log(err)
-            handleError(err, `${config.appDns}/padres`, "Hubo un error al buscar los datos de los padres")
+            handleError(err, `${config.appDns}/cursos`, "Hubo un error al buscar los datos de los cursos")
         });
     };
 
-    useEffect(retrievePadres, [page]);
+    useEffect(retrieveCursos, [page]);
 
+
+    const setActiveCurso = (curso, index) => {
+        setCurrentCurso(curso);
+        setCurrentIndex(index);
+    };
+
+    function onChangeSearchNombre(e) {
+        const searchNombre = e.target.value;
+        setSearchNombre(searchNombre);
+    }
+
+    function onChangeSearchTipo(e) {
+        const searchTipo = e.target.value;
+        setSearchTipo(searchTipo);
+    }
 
     const handlePageChange = (event, value) => {
         setPage(value);
     };
 
-
-    const setActivePadre = (padre, index) => {
-        setCurrentPadre(padre);
-        setCurrentIndex(index);
-    };
-
-    const deletePadreById = (id) => {
-        deletePadre(id).then((response) => {
-            handleResponse(204, response, navigateDeleteOkOrError, "El padre fue correctamente eliminado.")
+    const deleteCursoById = (id) => {
+        deleteCurso(id).then((response) => {
+            handleResponse(204, response, navigateDeleteOkOrError, "El curso fue correctamente eliminado.")
         }).catch(err => {
             console.log(err)
-            handleError(err, navigateDeleteOkOrError, "Hubo un error al eliminar el padre")
+            handleError(err, navigateDeleteOkOrError, "Hubo un error al eliminar el curso")
         })
     };
 
     return (
         <div className="list row col-md-12">
             <div className="row col-lg-12">
-                <div style={{marginLeft: 10}} className="row col-lg-6">
+                <div style={{marginLeft: 10}} className="row col-lg-5">
                     <div className="input-group mb-3">
                         <input
                             type="text"
                             className="form-control"
                             placeholder="Buscar por Nombre"
-                            value={searchNombreApellido}
-                            onChange={onChangeSearchNombreApellido}
+                            value={searchNombre}
+                            onChange={onChangeSearchNombre}
                         />
                         <div className="input-group-append">
                             <button
                                 className="btn btn-outline-secondary"
                                 type="button"
-                                onClick={retrievePadres}
+                                onClick={retrieveCursos}
                             >
                                 Buscar
                             </button>
                         </div>
                     </div>
                 </div>
-                <div style={{marginLeft: 10}} className="row col-lg-6">
-
+                <div style={{marginLeft: 10}} className="row col-lg-7">
                     <div className="input-group mb-3">
-                        <input
+                        <label className="form-control">Tipo:</label>
+                        <select
                             type="text"
                             className="form-control"
-                            placeholder="Buscar por Alumno"
-                            value={searchAlumno}
-                            onChange={onChangeSearchAlumno}
-                        />
+                            value={searchTipo}
+                            onChange={onChangeSearchTipo}
+                        >
+                            <option value="CAMBRIDGE_INTERNATIONAL">Cambridge</option>
+                            <option value="ADULTOS">Adultos</option>
+                            <option value="ESPECIFICOS">Específicos</option>
+                        </select>
                         <div className="input-group-append">
                             <button
                                 className="btn btn-outline-secondary"
                                 type="button"
-                                onClick={retrievePadres}
+                                onClick={retrieveCursos}
                             >
                                 Buscar
                             </button>
                         </div>
                     </div>
                 </div>
+
             </div>
+
             <div className="col-md-6">
-                <h4>Padres</h4>
+                <h4>Cursos</h4>
 
                 <div className="mt-3">
                     <Pagination
@@ -151,77 +154,83 @@ const PadresList = () => {
                 </div>
 
                 <ul className="list-group row-cols-md-8">
-                    {padres &&
-                    padres.map((padre, index) => (
+                    {cursos &&
+                    cursos.map((curso, index) => (
                         <li
                             className={
                                 "list-group-item " +
                                 (index === currentIndex ? "active" : "")
                             }
-                            onClick={() => setActivePadre(padre, index)}
+                            onClick={() => setActiveCurso(curso, index)}
                             key={index}
                         >
-                            {padre.nombreApellido}
+                            {curso.nombre}
                         </li>
                     ))}
                 </ul>
-                <Link
-                    to={"/padreForm"}
+                {!consulta && <Link
+                    to={"/cursoForm"}
                     className="m-3 btn btn-sm btn-danger"
                 >
-                    Agregar Padre
-                </Link>
+                    Agregar Curso
+                </Link>}
             </div>
             <div className="col-md-6">
-                {currentPadre ? (
+                {currentCurso ? (
                     <div>
-                        <h4>Padre</h4>
+                        <h4>Curso</h4>
                         <div>
                             <label>
                                 <strong>Nombre:</strong>
                             </label>{" "}
-                            {currentPadre.nombreApellido}
+                            {currentCurso.nombre}
                         </div>
                         <div>
                             <label>
-                                <strong>Detalles:</strong>
+                                <strong>Descripción:</strong>
                             </label>{" "}
-                            {currentPadre.detalles}
+                            {currentCurso.descripcion}
                         </div>
                         <div>
                             <label>
-                                <strong>DNI:</strong>
+                                <strong>Tipo de Curso:</strong>
                             </label>{" "}
-                            {currentPadre.dni}
+                            {currentCurso.tipoDeCurso}
+                        </div>
+                        <div>
+                            <label>
+                                <strong>Arancel:</strong>
+                            </label>{" "}
+                            {currentCurso.valorArancel}
                         </div>
 
 
-                        <Link
-                            to={"/padres/" + currentPadre.id}
+                        {!consulta && <Link
+                            to={"/cursos/" + currentCurso.id}
                             className="btn btn-primary btn-sm"
                         >
                             Modificar
-                        </Link>
-                        <button
+                        </Link>}
+                        {!consulta && <button
                             className="btn btn-danger btn-sm"
                             type="button"
                             onClick={() => swal({
                                 title: "Eliminar",
-                                text: "Se va a eliminar el padre " + currentPadre.nombreApellido + ". Por favor, confirmar dicha acción.",
+                                text: "Se va a eliminar el curso " + currentCurso.nombre + ". Por favor, confirmar dicha acción.",
                                 icon: "warning",
                                 buttons: ["Cancelar", "Eliminar"]
                             }).then(selection => {
                                 if (selection) {
-                                    deletePadreById(currentPadre.id)
+                                    deleteCursoById(currentCurso.id)
                                 }
                             })
                             }
                             style={{marginLeft: 10}}
                         >
                             Eliminar
-                        </button>
+                        </button>}
                         <Link
-                            to={"/padre/detail/" + currentPadre.id}
+                            to={"/curso/detail/" + currentCurso.id}
                             className="btn btn-info btn-sm"
                             style={{marginLeft: 10}}
                         >
@@ -231,13 +240,12 @@ const PadresList = () => {
                 ) : (
                     <div>
                         <br/>
-                        <p>Por favor, seleccione un padre...</p>
+                        <p>Por favor, seleccione un curso...</p>
                     </div>
                 )}
             </div>
         </div>
     );
-    // }
 }
 
-export default PadresList;
+export default CursosList;
