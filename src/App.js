@@ -32,6 +32,9 @@ import config from "./config";
 import CursosList from "./components/cursos/CursosList";
 import CursoForm from "./components/cursos/CursoForm";
 import CursoDetail from "./components/cursos/CursoDetail";
+import Finanzas from "./components/finanzas/Finanzas";
+import CobroForm from "./components/finanzas/CobroForm";
+import PagoForm from "./components/finanzas/PagoForm";
 
 const navigateHome = `${config.appDns}/home`
 const admin = 'ADMIN'
@@ -42,6 +45,7 @@ const App = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [user, setUser] = useState()
+    const [usuarioId, setUsuarioId] = useState()
     const [profile, setProfile] = useState()
     const [id, setId] = useState()
 
@@ -55,9 +59,12 @@ const App = () => {
                 setUser(res.data.username)
                 setProfile(res.data.perfil)
                 setId(res.data.id)
+                setUsuarioId(res.data.usuarioId)
                 // store the user in localStorage
                 localStorage.setItem('user', res.data.username)
                 localStorage.setItem('profile', res.data.perfil)
+                localStorage.setItem('id', res.data.id)
+                localStorage.setItem('usuarioId', res.data.usuarioId)
                 console.log(res.data)
             }).catch(err => {
             console.log(err)
@@ -167,6 +174,13 @@ const App = () => {
                             </Link>
                         </li>
                         }
+                        {profile === admin &&
+                        <li className="nav-item">
+                            <Link to={"/finanzas"} className="nav-link">
+                                Finanzas
+                            </Link>
+                        </li>
+                        }
                     </ul>
                     <ul className="form-inline my-2 my-lg-0">
                         <button onClick={handleLogout} className="btn btn-outline-light my-2 my-sm-0"
@@ -251,6 +265,10 @@ const App = () => {
                         props={props.match}/>}/>)}
                         {profile === profesor && (<Route exact path={"/cursos-consulta"}
                                                          render={() => <CursosList props={{'consulta': true}}/>}/>)}
+
+                        {profile === admin && (<Route exact path={"/finanzas"} component={Finanzas}/>)}
+                        {profile === admin && (<Route exact path={"/registrar-cobro"} component={CobroForm}/>)}
+                        {profile === admin && (<Route exact path={"/registrar-pago"} component={PagoForm}/>)}
 
 
                         <Redirect from='*' to='/home'/>
