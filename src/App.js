@@ -35,6 +35,9 @@ import CursoDetail from "./components/cursos/CursoDetail";
 import Finanzas from "./components/finanzas/Finanzas";
 import CobroForm from "./components/finanzas/CobroForm";
 import PagoForm from "./components/finanzas/PagoForm";
+import EntradaManualForm from "./components/finanzas/EntradaManualForm";
+import ConsultarCaja from "./components/finanzas/ConsultarCaja";
+import EliminarRegistracionMovimiento from "./components/finanzas/EliminarRegistracionMovimiento";
 
 const navigateHome = `${config.appDns}/home`
 const admin = 'ADMIN'
@@ -269,6 +272,10 @@ const App = () => {
                         {profile === admin && (<Route exact path={"/finanzas"} component={Finanzas}/>)}
                         {profile === admin && (<Route exact path={"/registrar-cobro"} component={CobroForm}/>)}
                         {profile === admin && (<Route exact path={"/registrar-pago"} component={PagoForm}/>)}
+                        {profile === admin && (<Route exact path={"/registrar-movimiento"} component={EntradaManualForm}/>)}
+                        {profile === admin && (<Route exact path={"/consultar-caja"} component={ConsultarCaja}/>)}
+                        {profile === admin && (<Route exact path={"/eliminar-cobro"} render={() => <EliminarRegistracionMovimiento props={{'tipoMovimiento': 'COBRO'}}/>}/>)}
+                        {profile === admin && (<Route exact path={"/eliminar-pago"} render={() => <EliminarRegistracionMovimiento props={{'tipoMovimiento': 'PAGO'}}/>}/>)}
 
 
                         <Redirect from='*' to='/home'/>

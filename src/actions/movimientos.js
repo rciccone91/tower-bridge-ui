@@ -48,3 +48,16 @@ export async function getMovimientos(params) {
     }
 }
 
+export async function getMovimientosPaginated(params) {
+    try {
+        const res = await MovimientosService.getPaginated(params).catch(err => {
+            console.log(err)
+            return Promise.reject(err);
+        })
+        return Promise.resolve(res);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+

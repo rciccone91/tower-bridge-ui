@@ -14,10 +14,6 @@ const currentYear = new Date().getFullYear();
 
 const validationSchema = Yup.object().shape({
 
-    proveedorId: Yup.number().typeError('Se debe seleccionar una opción')
-        .required('Se debe seleccionar una opción')
-        .min(1, 'Se debe seleccionar una opción'),
-
     fechaDeCobro: Yup.date()
         .typeError('Se debe seleccionar la fecha del pago')
         .required('Se debe seleccionar la fecha del pago')
@@ -37,15 +33,17 @@ const validationSchema = Yup.object().shape({
         .integer('El monto del pago debe ser un número')
         .positive('El monto del pago debe ser un número válido'),
 
+    tipoMovimiento: Yup.string()
+        .typeError('Se debe seleccionar una opción')
+        .required('EL tipo de movimiento es requerido'),
+
+
 });
 
 const navigateFinanzas = `${config.appDns}/finanzas`
 
 
-function PagoForm(props) {
-
-    const [proveedores, setProveedores] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+function EntradaManualForm(props) {
 
     const {
         register,
@@ -54,88 +52,30 @@ function PagoForm(props) {
     } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
-            proveedorId: undefined,
             fechaDeCobro: undefined,
             medioDePago: undefined,
             usuarioId: parseInt(localStorage.getItem("usuarioId"),10),
             detalle: '',
-            tipoMovimiento: 'PAGO',
+            tipoMovimiento: undefined,
             monto: undefined
-            //    COBRO,
-            //     PAGO,
-            //     ENTRADA_MANUAL,
-            //     SALIDA_MANUAL
         }
     });
 
 
-    const retrieveProveedores = () => {
-        ProveedorService.getAll().then(
-            res => {
-                setProveedores(res.data)
-                setIsLoading(false)
-            }).catch(err => {
-            console.log(err)
-            swal({
-                title: "Error",
-                text: 'Un error ocurrió al buscar los proveedores a asignar. Por favor contacta al administrador.',
-                icon: "error",
-                button: "OK"
-            }).then(() => {
-                window.location = navigateFinanzas
-            })
-        });
-    };
-
-    useEffect(() => {
-        retrieveProveedores();
-    }, [])
-
-
     const onSubmit = (data) => {
         createMovimiento(data).then((response) => {
-            handleResponse(201, response, navigateFinanzas, "El pago fue correctamente registrado.")
+            handleResponse(201, response, navigateFinanzas, "El movimiento fue correctamente registrado.")
         }).catch(err => {
             console.log(err)
-            handleError(err, navigateFinanzas, "Hubo un error al registrar el pago")
+            handleError(err, navigateFinanzas, "Hubo un error al registrar el movimiento")
         })
     };
 
-    function proveedoresOptions() {
-        return proveedores.map(a => <option value={a.id}>{a.nombre}</option>)
-    }
-
-    function getProveedoresSelect() {
-        return <div className="form-group">
-            <label>Proveedor</label>
-            <select
-                name="proveedorId"
-                {...register('proveedorId')}
-                className={`form-control ${errors.proveedorId ? 'is-invalid' : ''}`}>
-                <option value="0" selected disabled hidden>
-                    Seleccione un proveedor
-                </option>
-                {proveedoresOptions()}
-            </select>
-            <div className="invalid-feedback">{errors.proveedorId?.message}</div>
-        </div>;
-    }
-
     return (
         <div className="register-form">
-            {isLoading && <Loader
-                type="Rings"
-                color="#00BFFF"
-                height={100}
-                width={100}
-                timeout={3000} //3 secs
-            />
-            }
-            {!isLoading &&
             <form onSubmit={handleSubmit(onSubmit)}>
-                {getProveedoresSelect()}
                 <div className="form-group">
-                    <label>Fecha de pago</label>
+                    <label>Fecha de Movimiento</label>
                     <input
                         name="fechaDeCobro"
                         type="date"
@@ -143,6 +83,18 @@ function PagoForm(props) {
                         className={`form-control ${errors.fechaDeCobro ? 'is-invalid' : ''}`}
                     />
                     <div className="invalid-feedback">{errors.fechaDeCobro?.message}</div>
+                </div>
+                <div className="form-group">
+                    <label>Medio de Pago</label>
+                    <select
+                        name="tipoMovimiento"
+                        {...register('tipoMovimiento')}
+                        className={`form-control ${errors.tipoMovimiento ? 'is-invalid' : ''}`}
+                    >
+                        <option selected value={'ENTRADA_MANUAL'}>Entrada</option>
+                        <option value={'SALIDA_MANUAL'}>Salida</option>
+                    </select>
+                    <div className="invalid-feedback">{errors.tipoMovimiento?.message}</div>
                 </div>
                 <div className="form-group">
                     <label>Monto</label>
@@ -185,8 +137,7 @@ function PagoForm(props) {
                     </button>
                 </div>
             </form>
-            }
         </div>);
 }
 
-export default PagoForm
+export default EntradaManualForm

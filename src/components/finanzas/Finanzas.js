@@ -30,7 +30,7 @@ function Finanzas(props){
             <div className="card col-lg-3">
                 <div className="card-body ">
                     <h6 className="card-title">Registrar movimiento manual </h6>
-                    <Link to={"/report4"} className="btn btn-primary btn-sm">
+                    <Link to={"/registrar-movimiento"} className="btn btn-primary btn-sm">
                         Registrar movimiento
                     </Link>
                 </div>
@@ -40,7 +40,7 @@ function Finanzas(props){
             <div className="card col-lg-3">
                 <div className="card-body ">
                     <h6 className="card-title">Consultar estado de Caja </h6>
-                    <Link to={"/report4"} className="btn btn-primary btn-sm">
+                    <Link to={"/consultar-caja"} className="btn btn-primary btn-sm">
                         Consultar caja
                     </Link>
                 </div>
@@ -49,9 +49,9 @@ function Finanzas(props){
             </div>
             <div className="card col-lg-3">
                 <div className="card-body ">
-                    <h6 className="card-title">Consultar movimientos historicos</h6>
-                    <Link to={"/report2"} className="btn btn-primary btn-sm">
-                        Consultar movimientos
+                    <h6 className="card-title">Eliminar registración de cobro</h6>
+                    <Link to={"/eliminar-cobro"} className="btn btn-primary btn-sm">
+                        Eliminar Cobro
                     </Link>
                 </div>
             </div>
@@ -59,9 +59,9 @@ function Finanzas(props){
             </div>
             <div className="card col-lg-3">
                 <div className="card-body ">
-                    <h6 className="card-title">Eliminar registración de cobro</h6>
-                    <Link to={"/report3"} className="btn btn-primary btn-sm">
-                        Eliminar Cobro
+                    <h6 className="card-title">Eliminar registración de pago</h6>
+                    <Link to={"/eliminar-pago"} className="btn btn-primary btn-sm">
+                        Eliminar Pago
                     </Link>
                 </div>
             </div>

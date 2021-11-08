@@ -41,7 +41,7 @@ const validationSchema = Yup.object().shape({
 
     medioDePago: Yup.string()
         .typeError('Se debe seleccionar una opción')
-        .required('EL medio de pago eses requerido'),
+        .required('EL medio de pago es requerido'),
 
     detalle: Yup.string()
         .required('El detalle del cobro es requrido')

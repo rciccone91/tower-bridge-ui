@@ -5,6 +5,7 @@ import { executeWithCatch } from "../http-common";
 class MovimientosService {
 
     getAll(params) {
+        console.log("estoy en el get all movimientos")
         return http.get("/movimientos", { params }).catch(error => {
             if (!error.response) {
                 console.log(error.stack)
@@ -13,6 +14,21 @@ class MovimientosService {
                 return Promise.reject(error.response);
             }
         });
+    }
+
+    getPaginated(params) {
+        return http.get("/movimientos/paginated", { params }).catch(error => {
+            if (!error.response) {
+                console.log(error.stack)
+                return Promise.reject();
+            } else {
+                return Promise.reject(error.response);
+            }
+        });
+    }
+
+    cajaEstado(){
+        return executeWithCatch(http.get(`/caja/estado`))
     }
 
     get(id) {
