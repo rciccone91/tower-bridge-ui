@@ -26,22 +26,33 @@ const ClasesList = (props) => {
     const [count, setCount] = useState(0);
 
 
+    function cleanSearches() {
+        setSearchNombre("")
+        setSearchCurso("")
+        setSearchProfesor("")
+        setSearchDia("")
+    }
+
     const onChangeSearchNombre = (e) => {
+        cleanSearches()
         const searchNombre = e.target.value;
         setSearchNombre(searchNombre);
     };
 
     const onChangeSearchCurso = (e) => {
+        cleanSearches()
         const searchCurso = e.target.value;
         setSearchCurso(searchCurso);
     };
 
     const onChangeSearchProfesor = (e) => {
+        cleanSearches()
         const searchProfesor = e.target.value;
         setSearchProfesor(searchProfesor);
     };
 
     const onChangeSearchDia = (e) => {
+        cleanSearches()
         const searchDia = e.target.value;
         setSearchDia(searchDia);
     };

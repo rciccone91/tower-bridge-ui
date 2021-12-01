@@ -7,34 +7,9 @@ import {handleError, handleResponse} from "../../http-common";
 import config from "../../config"
 import CursosService from "../../services/CursosService";
 import swal from '@sweetalert/with-react';
-import  validDateRegex from '../../commons/commons'
 import Loader from "react-loader-spinner";
-import UsuariosService from "../../services/UsuariosService";
 
 
-// Yup.addMethod(Yup.string, "edadMinima", function (errorMessage) {
-//     return this.test(`fechaDeNacimiento`, errorMessage, function (value) {
-//         let anio = value.split('/')[2];
-//         let anioActual = new Date().getFullYear();
-//         return anio && (anioActual - parseInt(anio, 10)) >= 18 ;
-//     });
-// });
-//
-// Yup.addMethod(Yup.string, "edadMaxima", function (errorMessage) {
-//     return this.test(`fechaDeNacimiento`, errorMessage, function (value) {
-//         let anio = value.split('/')[2];
-//         let anioActual = new Date().getFullYear();
-//         return anio && (anioActual - parseInt(anio, 10)) <= 65 ;
-//     });
-// });
-//
-// Yup.addMethod(Yup.string, "anioValido", function (errorMessage) {
-//     return this.test(`fechaDeNacimiento`, errorMessage, function (value) {
-//         let anio = value.split('/')[2];
-//         let anioActual = new Date().getFullYear();
-//         return parseInt(anio, 10) < anioActual;
-//     });
-// });
 Yup.addMethod(Yup.number, 'emptyValor', function () {
     return this.transform((value) => (value === 0 ? undefined : value));
 });

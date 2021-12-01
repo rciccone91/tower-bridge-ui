@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {BrowserRouter as Router, Switch, Route, Link, Redirect} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import {useForm} from 'react-hook-form';
 
 import ProfesorForm from "./components/profesores/ProfesorForm";
 import PadreForm from "./components/padres/PadreForm";
@@ -38,11 +39,28 @@ import PagoForm from "./components/finanzas/PagoForm";
 import EntradaManualForm from "./components/finanzas/EntradaManualForm";
 import ConsultarCaja from "./components/finanzas/ConsultarCaja";
 import EliminarRegistracionMovimiento from "./components/finanzas/EliminarRegistracionMovimiento";
+import EstadoDeCuenta from "./components/finanzas/EstadoDeCuenta";
+import TresMesesAdeudadosReport from "./components/reportes/TresMesesAdeudadosReport";
+import PagoProveedoresReport from "./components/reportes/PagoProveedoresReport";
+import MovimientosEntreFechas from "./components/reportes/MovimientosEntreFechasReport";
+import ClasesPorDiaYHorarioReport from "./components/reportes/ClasesPorDiaYHorarioReport";
+import {yupResolver} from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 const navigateHome = `${config.appDns}/home`
 const admin = 'ADMIN'
 const profesor = 'PROFESOR'
 const alumno = 'ALUMNO'
+
+const validationSchema = Yup.object().shape({
+    username: Yup.string()
+        .required('El nombre de usuario es requerido')
+        .matches('^(?!\\s*$).+', {message: 'El nombre de usuario no puede estar vacío'}),
+
+    password: Yup.string()
+        .required('El password es requerido')
+        .matches('^(?!\\s*$).+', {message: 'El password no puede estar vacío'})
+});
 
 const App = () => {
     const [username, setUsername] = useState("");
@@ -73,7 +91,7 @@ const App = () => {
             console.log(err)
             swal({
                 title: "Error",
-                text: err.data.errorMessage,
+                text: err ? err.data.errorMessage : 'Ocurrió un error inesperado al intentar loguearse. Por favor contactar al administrador',
                 icon: "error",
                 button: "OK"
             }).then(() => {
@@ -84,13 +102,14 @@ const App = () => {
 
     const handleLogout = () => {
         setId()
-        setUser({});
+        setUser(undefined);
         setProfile({});
         setUsername("");
         setPassword("");
         localStorage.clear();
         window.location = navigateHome
     };
+
 
     useEffect(() => {
         const loggedInUser = localStorage.getItem("user");
@@ -99,7 +118,7 @@ const App = () => {
             setUser(loggedInUser);
             setProfile(loggedInUserProfile);
         }
-    }, []);
+    }, [])
 
     return (
         <div>
@@ -184,6 +203,13 @@ const App = () => {
                             </Link>
                         </li>
                         }
+                        {profile === alumno &&
+                        <li className="nav-item">
+                            <Link to={"/estado-cuenta"} className="nav-link">
+                                Estado de cuenta
+                            </Link>
+                        </li>
+                        }
                     </ul>
                     <ul className="form-inline my-2 my-lg-0">
                         <button onClick={handleLogout} className="btn btn-outline-light my-2 my-sm-0"
@@ -246,6 +272,17 @@ const App = () => {
                                                                                component={ClasesDeCursosEspecificosReport}/>)}
                         (profile === admin || profile === profesor) && (<Route path="/report11"
                                                                                component={ValorExamenInternacionalReport}/>)}
+                        (profile === admin || profile === profesor) && (<Route path="/report1"
+                                                                               component={TresMesesAdeudadosReport}/>)}
+
+                        (profile === admin || profile === profesor) && (<Route path="/report7"
+                                                                               component={PagoProveedoresReport}/>)}
+
+                        (profile === admin || profile === profesor) && (<Route path="/report8"
+                                                                               component={MovimientosEntreFechas}/>)}
+
+                        (profile === admin || profile === profesor) && (<Route path="/report9"
+                                                                               component={ClasesPorDiaYHorarioReport}/>)}
 
                         {profile === admin && (<Route exact path={"/clases"} component={ClasesList}/>)}
                         {profile === admin && (
@@ -255,9 +292,10 @@ const App = () => {
                             <Route path="/clase/detail/:id" render={(props) => <ClaseDetail props={props.match}/>}/>)}
 
 
-                        //TODO - hacer el form de clases asignadas para cada uno
-                        {profile === profesor && (<Route exact path={"/mis-clases-dictadas"} render={() => <ClasesList props={{'profesorId': id}}/>}/>)}
-                        {profile === alumno && (<Route exact path={"/mis-clases"} render={() => <ClasesList props={{'alumnoId': id}}/>}/>)}
+                        {profile === profesor && (<Route exact path={"/mis-clases-dictadas"}
+                                                         render={() => <ClasesList props={{'profesorId': id}}/>}/>)}
+                        {profile === alumno && (
+                            <Route exact path={"/mis-clases"} render={() => <ClasesList props={{'alumnoId': id}}/>}/>)}
 
 
                         {profile === admin && (<Route exact path={"/cursos"} component={CursosList}/>)}
@@ -272,10 +310,19 @@ const App = () => {
                         {profile === admin && (<Route exact path={"/finanzas"} component={Finanzas}/>)}
                         {profile === admin && (<Route exact path={"/registrar-cobro"} component={CobroForm}/>)}
                         {profile === admin && (<Route exact path={"/registrar-pago"} component={PagoForm}/>)}
-                        {profile === admin && (<Route exact path={"/registrar-movimiento"} component={EntradaManualForm}/>)}
+                        {profile === admin && (
+                            <Route exact path={"/registrar-movimiento"} component={EntradaManualForm}/>)}
                         {profile === admin && (<Route exact path={"/consultar-caja"} component={ConsultarCaja}/>)}
-                        {profile === admin && (<Route exact path={"/eliminar-cobro"} render={() => <EliminarRegistracionMovimiento props={{'tipoMovimiento': 'COBRO'}}/>}/>)}
-                        {profile === admin && (<Route exact path={"/eliminar-pago"} render={() => <EliminarRegistracionMovimiento props={{'tipoMovimiento': 'PAGO'}}/>}/>)}
+                        {profile === admin && (<Route exact path={"/eliminar-cobro"}
+                                                      render={() => <EliminarRegistracionMovimiento
+                                                          props={{'tipoMovimiento': 'COBRO'}}/>}/>)}
+                        {profile === admin && (<Route exact path={"/eliminar-pago"}
+                                                      render={() => <EliminarRegistracionMovimiento
+                                                          props={{'tipoMovimiento': 'PAGO'}}/>}/>)}
+
+
+                        {profile === alumno && (<Route exact path={"/estado-cuenta"}
+                                                       render={() => <EstadoDeCuenta props={{'profesorId': id}}/>}/>)}
 
 
                         <Redirect from='*' to='/home'/>
@@ -283,25 +330,48 @@ const App = () => {
                 </div>
             </Router>}
             {!user &&
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="username">Username: </label>
-                <input
-                    type="text"
-                    value={username}
-                    placeholder="Ingresar usuario"
-                    onChange={({target}) => setUsername(target.value)}
-                />
-                <div>
-                    <label htmlFor="password">password: </label>
-                    <input
-                        type="password"
-                        value={password}
-                        placeholder="Ingresar password"
-                        onChange={({target}) => setPassword(target.value)}
-                    />
+            <div>
+                <nav className="navbar navbar-expand navbar-dark bg-secondary">
+                </nav>
+                <div className="list row col-md-12">
+                    <div className="col-md-12" style={{textAlign: "center"}}>
+                        <h1>Login - Tower Bridge School</h1>
+                    </div>
+                    <div className="col-md-12" style={{textAlign: "center"}}>
+                        <img src="logo-tower2.png" alt="Tower Logo" width="128" height="123"/>
+                    </div>
                 </div>
-                <button type="submit">Login</button>
-            </form>
+                <div className="container mt-4">
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group align-content-center">
+                            <div className="form-group">
+                                <label htmlFor="username">Username: </label>
+                                <input
+                                    name={"username"}
+                                    type="text"
+                                    value={username}
+                                    placeholder="Ingresar usuario"
+                                    className={`form-control`}
+                                    onChange={({target}) => setUsername(target.value)}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="password">Password: </label>
+                                <input
+                                    name={"password"}
+                                    type="password"
+                                    value={password}
+                                    placeholder="Ingresar password"
+                                    className={`form-control`}
+                                    onChange={({target}) => setPassword(target.value)}
+                                />
+                            </div>
+                            <button type="submit" className="btn btn-primary" >Login</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
             }
         </div>
     );

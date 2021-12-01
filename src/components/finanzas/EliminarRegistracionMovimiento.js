@@ -19,9 +19,10 @@ function toStringDate(fecha) {
 }
 
 
-function EliminarRegistracionMovimiento(props){
+function EliminarRegistracionMovimiento(props) {
 
     const tipoMovimiento = props && props.props ? props.props.tipoMovimiento : undefined
+    const usuarioId = parseInt(localStorage.getItem("usuarioId"), 10)
 
     const [movimientos, setMovimientos] = useState([]);
     const [currentMovimiento, setCurrentMovimiento] = useState(null);
@@ -29,7 +30,6 @@ function EliminarRegistracionMovimiento(props){
     const [page, setPage] = useState(1);
     const [count, setCount] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-
 
 
     const getRequestParams = (page, tipoMovimiento) => {
@@ -44,7 +44,7 @@ function EliminarRegistracionMovimiento(props){
     };
 
     const retrieveMovimientos = () => {
-        const params = getRequestParams(page,tipoMovimiento);
+        const params = getRequestParams(page, tipoMovimiento);
         getMovimientosPaginated(params).then((response) => {
             const {movimientos, totalPages} = response.data;
 
@@ -75,7 +75,8 @@ function EliminarRegistracionMovimiento(props){
     };
 
     const deleteMovimientoById = (id) => {
-        deleteMovimiento(id).then((response) => {
+        const params = {'usuarioId': usuarioId}
+        deleteMovimiento(id,params).then((response) => {
             handleResponse(204, response, navigateDeleteOkOrError, "El movimiento fue correctamente eliminado.")
         }).catch(err => {
             console.log(err)
@@ -83,77 +84,77 @@ function EliminarRegistracionMovimiento(props){
         })
     };
 
-    function getMovimientoDescription(movimiento){
-        if(tipoMovimiento === 'COBRO'){
-            return  `Fecha: ${toStringDate(movimiento.fecha)} Monto: ${movimiento.monto} Medio: ${movimiento.medioDePago} Alumno: ${movimiento.alumno.nombreApellido} Curso: ${movimiento.curso.nombre}`
-        } else return  `Fecha: ${toStringDate(movimiento.fecha)} Monto: ${movimiento.monto}  Medio: ${movimiento.medioDePago} Proveedor: ${movimiento.proveedor.nombre}`
+    function getMovimientoDescription(movimiento) {
+        if (tipoMovimiento === 'COBRO') {
+            return `Fecha: ${toStringDate(movimiento.fecha)} - Monto: ${movimiento.monto} - Medio: ${movimiento.medioDePago} - Alumno: ${movimiento.alumno.nombreApellido} - Curso: ${movimiento.curso.nombre}`
+        } else return `Fecha: ${toStringDate(movimiento.fecha)} - Monto: ${movimiento.monto}  - Medio: ${movimiento.medioDePago} - Proveedor: ${movimiento.proveedor.nombre}`
     }
 
     return (
         <div>
-        {isLoading && <Loader
-            type="Rings"
-            color="#00BFFF"
-            height={100}
-            width={100}
-            timeout={3000} //3 secs
-        />
-}
-    {!isLoading &&
-        <div className="list row col-md-12">
-            <div className="col-md-12">
-                <h4>Cobros</h4>
+            {isLoading && <Loader
+                type="Rings"
+                color="#00BFFF"
+                height={100}
+                width={100}
+                timeout={3000} //3 secs
+            />
+            }
+            {!isLoading &&
+            <div className="list row col-md-12">
+                <div className="col-md-12">
+                    <h4>{tipoMovimiento}</h4>
 
-                <div className="mt-3">
-                    <Pagination
-                        className="my-3"
-                        count={count}
-                        page={page}
-                        siblingCount={1}
-                        boundaryCount={1}
-                        variant="outlined"
-                        shape="rounded"
-                        size="small"
-                        onChange={handlePageChange}
-                    />
-                </div>
+                    <div className="mt-3">
+                        <Pagination
+                            className="my-3"
+                            count={count}
+                            page={page}
+                            siblingCount={1}
+                            boundaryCount={1}
+                            variant="outlined"
+                            shape="rounded"
+                            size="small"
+                            onChange={handlePageChange}
+                        />
+                    </div>
 
-                <ul className="list-group row-cols-md-12">
-                    {movimientos &&
-                    movimientos.map((movimiento, index) => (
-                        <li
-                            className={
-                                "list-group-item " +
-                                (index === currentIndex ? "active" : "")
+                    <ul className="list-group row-cols-md-12">
+                        {movimientos &&
+                        movimientos.map((movimiento, index) => (
+                            <li
+                                className={
+                                    "list-group-item " +
+                                    (index === currentIndex ? "active" : "")
+                                }
+                                onClick={() => setActiveMovimiento(movimiento, index)}
+                                key={index}
+                            >
+                                {getMovimientoDescription(movimiento)}
+                            </li>
+                        ))}
+                    </ul>
+                    <button
+                        disabled={!currentMovimiento}
+                        className="btn btn-danger btn-sm"
+                        type="button"
+                        onClick={() => swal({
+                            title: "Eliminar",
+                            text: "Se va a eliminar el movimiento seleccionado. Por favor, confirmar dicha acción.",
+                            icon: "warning",
+                            buttons: ["Cancelar", "Eliminar"]
+                        }).then(selection => {
+                            if (selection) {
+                                deleteMovimientoById(currentMovimiento.id)
                             }
-                            onClick={() => setActiveMovimiento(movimiento, index)}
-                            key={index}
-                        >
-                            {getMovimientoDescription(movimiento)}
-                        </li>
-                    ))}
-                </ul>
-                <button
-                    disabled={!currentMovimiento}
-                    className="btn btn-danger btn-sm"
-                    type="button"
-                    onClick={() => swal({
-                        title: "Eliminar",
-                        text: "Se va a eliminar el movimiento seleccionado. Por favor, confirmar dicha acción.",
-                        icon: "warning",
-                        buttons: ["Cancelar", "Eliminar"]
-                    }).then(selection => {
-                        if (selection) {
-                            deleteMovimientoById(currentMovimiento.id)
+                        })
                         }
-                    })
-                    }
-                    style={{marginTop: 10}}
-                >
-                    Eliminar
-                </button>
-            </div>
-        </div>}
+                        style={{marginTop: 10}}
+                    >
+                        Eliminar
+                    </button>
+                </div>
+            </div>}
         </div>
     );
     // }

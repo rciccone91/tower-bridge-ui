@@ -53,7 +53,7 @@ function ClaseDetail(props) {
                 <div className="col-md-12">
                     <h2>Clase</h2>
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-6">
                     <h5>Nombre</h5>
                     <label>{data.nombre}</label>
                     <h5>Descripción</h5>
@@ -64,8 +64,15 @@ function ClaseDetail(props) {
                     <label>{data.horarioInicio} - {data.horarioFin} hs</label>
                     <h5>Curso</h5>
                     <label>{data.curso.nombre}</label>
+                    <h3>Alumnos</h3>
+                    {data.alumnos &&
+                    data.alumnos.map((alumno) => (
+                        <div>
+                            <label>{alumno.nombre}</label>
+                        </div>
+                    ))}
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-6">
                     <h4>Classroom</h4>
                     <h5>Link</h5>
                     <label>{data.linkClassroom}</label>
@@ -80,15 +87,20 @@ function ClaseDetail(props) {
                     <label>{data.profesor.nombre}</label>
 
                 </div>
-                <div className="col-md-4">
+                {/*<div className="col-md-4">*/}
 
-                    <h3>Alumnos</h3>
-                    {data.alumnos &&
-                    data.alumnos.map((alumno) => (
-                        <label>{alumno.nombre}</label>
-                    ))}
 
-                </div>
+                {/*</div>*/}
+                {/*<div className="col-md-12">*/}
+                {/*    <h3>Alumnos</h3>*/}
+                {/*    {data.alumnos &&*/}
+                {/*    data.alumnos.map((alumno) => (*/}
+                {/*        <div>*/}
+                {/*            <label>{alumno.nombre}</label>*/}
+                {/*        </div>*/}
+                {/*    ))}*/}
+
+                {/*</div>*/}
             </div>
             }
         </div>

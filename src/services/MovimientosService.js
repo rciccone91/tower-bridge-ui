@@ -16,6 +16,18 @@ class MovimientosService {
         });
     }
 
+    getAll(params) {
+        console.log("estoy en el get all movimientos")
+        return http.get("/movimientos", { params }).catch(error => {
+            if (!error.response) {
+                console.log(error.stack)
+                return Promise.reject();
+            } else {
+                return Promise.reject(error.response);
+            }
+        });
+    }
+
     getPaginated(params) {
         return http.get("/movimientos/paginated", { params }).catch(error => {
             if (!error.response) {
@@ -44,10 +56,14 @@ class MovimientosService {
         return executeWithCatch(http.patch(`/movimientos/${id}`, data))
     }
 
-    delete(id) {
-        return executeWithCatch(http.delete(`/movimientos/${id}`))
+    delete(id,params) {
+        return executeWithCatch(http.delete(`/movimientos/${id}`, { params }))
     }
 
+    getEstadoDeCuenta(params) {
+        return executeWithCatch(http.get(`/estado-de-cuenta`, { params }))
+
+    }
 }
 
 export default new MovimientosService();

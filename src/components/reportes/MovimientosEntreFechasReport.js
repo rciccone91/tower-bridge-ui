@@ -1,47 +1,64 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import config from "../../config"
 import MovimientosService from "../../services/MovimientosService";
 import swal from '@sweetalert/with-react';
-import Loader from "react-loader-spinner";
 import {handleError} from "../../http-common";
+import jsPDF from "jspdf";
+import {Link} from "react-router-dom";
 
+function toStringDate(fecha) {
+    let date = new Date(fecha);
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+    const yyyy = date.getFullYear();
+    return `${dd}-${mm}-${yyyy}`
+}
 
 function MovimientoItem(props) {
     const movimiento = props.props
 
-    function toStringDate(fecha) {
-        let date = new Date(fecha);
-        const dd = String(date.getDate()).padStart(2, '0');
-        const mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
-        const yyyy = date.getFullYear();
-        return `${dd}-${mm}-${yyyy}`
-    }
-
-
     return (
         <tr className="col-lg-12">
             <td className="col-lg-1">{movimiento.monto}</td>
-            <td className="col-lg-1">{movimiento.monto < 0 ? 'Si' : 'No'}</td>
-            <td className="col-lg-2">{movimiento.medioDePago}</td>
-            <td className="col-lg-2">{movimiento.tipoMovimiento}</td>
+            <td className="col-lg-3">{movimiento.tipoMovimiento}</td>
+            <td className="col-lg-3">{movimiento.medioDePago}</td>
             <td className="col-lg-3">{toStringDate(movimiento.fecha).trim()}</td>
-            <td className="col-lg-2">{movimiento.proveedor && movimiento.proveedor.nombre}</td>
-            <td className="col-lg-2">{movimiento.alumno && movimiento.alumno.nombreApellido}</td>
-            <td className="col-lg-2">{movimiento.curso && movimiento.curso.nombre}</td>
+            <td className="col-lg-4">{movimiento.detalle}</td>
         </tr>
     );
 }
 
-function ConsultarCaja(props) {
+function MovimientosEntreFechas(props) {
 
-    const navigateFinanzas = `${config.appDns}/finanzas`
-
-    const [data, setData] = useState({});
     const [movimientos, setMovimientos] = useState([]);
     const [fechaDesde, setFechaDesde] = useState(undefined);
     const [fechaHasta, setFechaHasta] = useState(undefined);
-    const [isLoading, setIsLoading] = useState(true);
 
+    function exportPDF(movimientos) {
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 40;
+        const doc = new jsPDF(orientation, unit, size);
+
+        doc.setFontSize(12);
+
+        const title = "Movimientos de dinero entre fechas";
+        const headers = [["Monto", "Tipo", "Medio de Pago", "Fecha","Detalle"]];
+
+        const data = movimientos.map(m => [m.monto, m.tipoMovimiento, m.medioDePago, toStringDate(m.fecha).trim(), m.detalle]);
+
+        let content = {
+            startY: 50,
+            head: headers,
+            body: data
+        };
+
+        doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        doc.save("movimientos-de-dinero.pdf")
+    }
 
     function toParamDate(fecha) {
         let date = new Date(fecha);
@@ -51,24 +68,6 @@ function ConsultarCaja(props) {
         const yyyy = date.getFullYear();
         return `${yyyy}-${mm}-${dd}`
     }
-
-    useEffect(() => {
-        MovimientosService.cajaEstado().then(
-            res => {
-                setData(res.data);
-                setIsLoading(false);
-            }).catch(err => {
-            console.log(err)
-            swal({
-                title: "Error",
-                text: 'Un error ocurrió al buscar los datos de la caja y los movimientos. Por favor contactá al administrador.',
-                icon: "error",
-                button: "OK"
-            }).then(() => {
-                window.location = navigateFinanzas
-            })
-        });
-    }, [])
 
 
     function onChangeFechaDesde(e) {
@@ -81,9 +80,10 @@ function ConsultarCaja(props) {
         setFechaHasta(fechaHasta);
     }
 
-    function getFechasParams() {
-        return {fechaDesde: toParamDate(fechaDesde), fechaHasta: toParamDate(fechaHasta)}
+    function getParams() {
+        return {fechaDesde: toParamDate(fechaDesde), fechaHasta: toParamDate(fechaHasta), esEntrada: true}
     }
+
 
     function getDifferenceInDays(d1, d2) {
         const date1 = new Date(d1);
@@ -111,9 +111,8 @@ function ConsultarCaja(props) {
                 button: "OK"
             })
         } else {
-            const params = getFechasParams()
             setMovimientos([])
-            MovimientosService.getAll(params).then((response) => {
+            MovimientosService.getAll(getParams()).then((response) => {
                 if (response.data.length === 0) {
                     swal({
                         text: 'La búsqueda realizada no trajo ningún resultado. Verificar los parámetros ingresados.',
@@ -126,34 +125,18 @@ function ConsultarCaja(props) {
                 }
             }).catch(err => {
                 console.log(err)
-                handleError(err, `${config.appDns}/clases`, "Hubo un error al buscar los datos de los clases")
+                handleError(err, `${config.appDns}/reportes`, "Hubo un error al buscar los datos de los movimientos.")
             });
         }
     }
 
     return (
         <div className="list row col-lg-12">
-            {isLoading && <Loader
-                type="Rings"
-                color="#00BFFF"
-                height={100}
-                width={100}
-                timeout={3000} //3 secs
-            />
-            }
-            {!isLoading &&
             <div>
                 <div className="col-md-12">
-                    <h4>Estado de Caja</h4>
+                    <h3><strong>{'Movimientos entre fechas'}</strong></h3>
                 </div>
                 <br/>
-                <div className="col-md-12">
-                    <h5>Dinero disponible: ${data.estadoCaja.valorActual}</h5>
-                </div>
-                <br/><br/>
-                <div className="col-md-12">
-                    <h4>Movimientos</h4>
-                </div>
                 <div className="row col-lg-12">
                     <div style={{marginLeft: 10}} className="row col-lg-5">
                         <label>Fecha desde:</label>
@@ -209,13 +192,10 @@ function ConsultarCaja(props) {
                         <thead>
                         <tr>
                             <th className="col-lg-1">Monto</th>
-                            <th className="col-lg-1">Eliminado</th>
-                            <th className="col-lg-2">Medio de Pago</th>
-                            <th className="col-lg-2">Tipo de Movimiento</th>
-                            <th className="col-lg-2">Fecha</th>
-                            <th className="col-lg-2">Proveedor</th>
-                            <th className="col-lg-2">Alumno</th>
-                            <th className="col-lg-2">Curso</th>
+                            <th className="col-lg-3">Tipo</th>
+                            <th className="col-lg-3">Medio de Pago</th>
+                            <th className="col-lg-3">Fecha</th>
+                            <th className="col-lg-4">Detalle</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -228,11 +208,25 @@ function ConsultarCaja(props) {
                         }
                         </tbody>
                     </table>
+                    <div className="list row col-md-6">
+                        <div className="list row col-md-3">
+                            <Link
+                                to={"/reportes"}
+                                className="btn btn-secondary btn-md"
+                            >
+                                Volver
+                            </Link>
+                        </div>
+                        <div className="list row col-md-3">
+                            <button className="btn btn-info btn-md" onClick={() => exportPDF(movimientos)}>Exportar
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>}
+            </div>
         </div>
     )
 
 }
 
-export default ConsultarCaja
+export default MovimientosEntreFechas

@@ -20,14 +20,20 @@ const AlumnosList = () => {
     const [page, setPage] = useState(1);
     const [count, setCount] = useState(0);
 
+    function cleanSearches() {
+        setSearchNombreApellido("")
+        setSearchAnioEscolar("")
+    }
 
     const onChangeSearchNombreApellido = (e) => {
+        cleanSearches()
         const searchNombreApellido = e.target.value;
         setSearchNombreApellido(searchNombreApellido);
 
     };
 
     const onChangeAnioEscolar = (e) => {
+        cleanSearches()
         const searchAnioEscolar = e.target.value;
         setSearchAnioEscolar(searchAnioEscolar);
     };

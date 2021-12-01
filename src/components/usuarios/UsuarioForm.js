@@ -109,7 +109,7 @@ function UsuarioForm(props){
                         {...register('perfil')}
                         className={`form-control ${errors.perfil ? 'is-invalid' : ''}`}>
                         <option value="ADMIN">Admin</option>
-                        <option value="PROFESOR">Prosfesor</option>
+                        <option value="PROFESOR">Profesor</option>
                         <option value="ALUMNO">Alumno</option>
                     </select>
                     <div className="invalid-feedback">{errors.perfil?.message}</div>

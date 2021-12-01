@@ -57,6 +57,10 @@ const CursosList = (props) => {
 
     useEffect(retrieveCursos, [page]);
 
+    function cleanSearches() {
+        setSearchNombre("")
+        setSearchTipo("")
+    }
 
     const setActiveCurso = (curso, index) => {
         setCurrentCurso(curso);
@@ -64,11 +68,13 @@ const CursosList = (props) => {
     };
 
     function onChangeSearchNombre(e) {
+        cleanSearches()
         const searchNombre = e.target.value;
         setSearchNombre(searchNombre);
     }
 
     function onChangeSearchTipo(e) {
+        cleanSearches()
         const searchTipo = e.target.value;
         setSearchTipo(searchTipo);
     }
@@ -202,6 +208,12 @@ const CursosList = (props) => {
                                 <strong>Arancel:</strong>
                             </label>{" "}
                             {currentCurso.valorArancel}
+                        </div>
+                        <div>
+                            <label>
+                                <strong>Valor Examen internacional:</strong>
+                            </label>{" "}
+                            {currentCurso.valorExamen ?  `${currentCurso.valorExamen} USD` : 'No hay examen' }
                         </div>
 
 

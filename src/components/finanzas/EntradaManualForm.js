@@ -15,23 +15,23 @@ const currentYear = new Date().getFullYear();
 const validationSchema = Yup.object().shape({
 
     fechaDeCobro: Yup.date()
-        .typeError('Se debe seleccionar la fecha del pago')
-        .required('Se debe seleccionar la fecha del pago')
-        .max(currentDate, 'La fecha de pago no puede ser posterior al dia de hoy'),
+        .typeError('Se debe seleccionar la fecha del movimiento')
+        .required('Se debe seleccionar la fecha del movimiento')
+        .max(currentDate, 'La fecha de movimiento no puede ser posterior al dia de hoy'),
 
     medioDePago: Yup.string()
         .typeError('Se debe seleccionar una opción')
-        .required('EL medio de pago es requerido'),
+        .required('EL medio de de pago del movimiento es requerido'),
 
     detalle: Yup.string()
-        .required('El detalle del pago es requrido')
-        .matches('^(?!\\s*$).+', {message: 'El detalle del pago no puede estar vacío'}),
+        .required('El detalle del movimiento es requrido')
+        .matches('^(?!\\s*$).+', {message: 'El detalle del movimiento no puede estar vacío'}),
 
     monto: Yup.number()
-        .typeError('El monto del pago debe ser un número')
-        .required('El monto del pago es requerido')
-        .integer('El monto del pago debe ser un número')
-        .positive('El monto del pago debe ser un número válido'),
+        .typeError('El monto del movimiento debe ser un número')
+        .required('El monto del movimiento es requerido')
+        .integer('El monto del movimiento debe ser un número')
+        .positive('El monto del movimiento debe ser un número válido'),
 
     tipoMovimiento: Yup.string()
         .typeError('Se debe seleccionar una opción')
@@ -85,7 +85,7 @@ function EntradaManualForm(props) {
                     <div className="invalid-feedback">{errors.fechaDeCobro?.message}</div>
                 </div>
                 <div className="form-group">
-                    <label>Medio de Pago</label>
+                    <label>Tipo de Movimiento</label>
                     <select
                         name="tipoMovimiento"
                         {...register('tipoMovimiento')}

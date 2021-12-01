@@ -85,13 +85,46 @@ function Reportes(props){
             <div className="col-md-1">
             </div>
             <div className="card col-md-5">
-                {/*<div className="card-body ">*/}
-                {/*    <h5 className="card-title">Clases para necesidades específicas</h5>*/}
-                {/*    <p className="card-text">Lista con todas las clases que correspondan a un curso que atiende una necesidad específica.</p>*/}
-                {/*    <Link to={"/report11"} className="btn btn-primary btn-sm">*/}
-                {/*        Ver reporte*/}
-                {/*    </Link>*/}
-                {/*</div>*/}
+                <div className="card-body ">
+                    <h5 className="card-title">Tres meses adeudados</h5>
+                    <p className="card-text">Lista con los alumnos que adeudan 3 o mas meses de arancel.</p>
+                    <Link to={"/report1"} className="btn btn-primary btn-sm">
+                        Ver reporte
+                    </Link>
+                </div>
+            </div>
+            <div className="col-md-1">
+            </div>
+            <div className="card col-md-5">
+                <div className="card-body ">
+                    <h5 className="card-title">Pago a proveedores entre fechas</h5>
+                    <p className="card-text">Lista con los pagos a proveedores entre fechas.</p>
+                    <Link to={"/report7"} className="btn btn-primary btn-sm">
+                        Ver reporte
+                    </Link>
+                </div>
+            </div>
+            <div className="col-md-1">
+            </div>
+            <div className="card col-md-5">
+                <div className="card-body ">
+                    <h5 className="card-title">Movimientos de dinero entre fechas</h5>
+                    <p className="card-text">Lista con los movimientos manuales de dinero entre fechas</p>
+                    <Link to={"/report8"} className="btn btn-primary btn-sm">
+                        Ver reporte
+                    </Link>
+                </div>
+            </div>
+            <div className="col-md-1">
+            </div>
+            <div className="card col-md-5">
+                <div className="card-body ">
+                    <h5 className="card-title">Clases por dia y horario</h5>
+                    <p className="card-text">Lista las clases para un día y rango horario específico</p>
+                    <Link to={"/report9"} className="btn btn-primary btn-sm">
+                        Ver reporte
+                    </Link>
+                </div>
             </div>
         </div>
     )

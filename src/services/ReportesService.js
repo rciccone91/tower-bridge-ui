@@ -24,6 +24,17 @@ class ReportesService {
         });
     }
 
+    getTresMesesAdeudadosReport() {
+        return http.get("/reportes/tres-meses-adeudados").catch(error => {
+            if (!error.response) {
+                console.log(error.stack)
+                return Promise.reject();
+            } else {
+                return Promise.reject(error.response);
+            }
+        });
+    }
+
     getAlumnosConMalDesempenioReport() {
         return http.get("/reportes/mal-desempenio").catch(error => {
             if (!error.response) {
@@ -70,6 +81,17 @@ class ReportesService {
 
     getClasesDeCursosEspecificosReport() {
         return http.get("/reportes/clases-cursos-especificos").catch(error => {
+            if (!error.response) {
+                console.log(error.stack)
+                return Promise.reject();
+            } else {
+                return Promise.reject(error.response);
+            }
+        });
+    }
+
+    getClasesPorDiaYHorario(params) {
+        return http.get("/reportes/clases-por-horario", {params}).catch(error => {
             if (!error.response) {
                 console.log(error.stack)
                 return Promise.reject();

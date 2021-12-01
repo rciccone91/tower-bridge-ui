@@ -79,7 +79,7 @@ const validationSchema = Yup.object().shape({
   usuarioId: Yup.number()
       .typeError('El usuario es requerido. Por favor, cree un nuevo usuario si el mismo no existe.')
       .required('El usuario es requerido. Por favor, cree un nuevo usuario si el mismo no existe.')
-      .min(1, 'Se debe seleccionar una opción'),
+      .min(1, 'Se debe seleccionar una opción. Si no hay usuarios para seleccionar, cree uno nuevo.'),
 
 });
 
@@ -209,8 +209,9 @@ function ProfesorForm(props){
           <select
               name="usuarioId"
               {...register('usuarioId')}
-              className={`form-control ${errors.usuarioId ? 'is-invalid' : ''}`}>
-            <option value="0" selected disabled hidden>Seleccione un usuario a asignar</option>
+              className={`form-control ${errors.usuarioId ? 'is-invalid' : ''}`}
+              defaultValue={0}>
+            <option value="0" selected disabled>Seleccione un usuario a asignar</option>
             {usuariosOptions()}
           </select>
           <div className="invalid-feedback">{errors.usuarioId?.message}</div>

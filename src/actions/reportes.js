@@ -1,5 +1,18 @@
 import ReportesService from "../services/ReportesService";
 
+export async function getTresMesesAdeudados() {
+    try {
+        const res = await ReportesService.getTresMesesAdeudadosReport().catch(err => {
+            console.log(err)
+            return Promise.reject(err);
+        })
+        return Promise.resolve(res);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
 export async function getClasesDeCursosEspecificosReport() {
     try {
         const res = await ReportesService.getClasesDeCursosEspecificosReport().catch(err => {

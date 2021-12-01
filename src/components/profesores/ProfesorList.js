@@ -54,12 +54,19 @@ const ProfesoresList = () => {
         setCurrentIndex(index);
     };
 
+    function cleanSearches() {
+        setSearchNombre("")
+        setSearchCurso("")
+    }
+
     function onChangeSearchNombre(e) {
+        cleanSearches()
         const searchNombre = e.target.value;
         setSearchNombre(searchNombre);
     }
 
     function onChangeSearchCurso(e) {
+        cleanSearches()
         const searchCurso = e.target.value;
         setSearchCurso(searchCurso);
     }
@@ -154,6 +161,18 @@ const ProfesoresList = () => {
                                 <strong>Nombre:</strong>
                             </label>{" "}
                             {currentProfesor.nombreApellido}
+                        </div>
+                        <div>
+                            <label>
+                                <strong>Fecha de Nacimiento:</strong>
+                            </label>{" "}
+                            {currentProfesor.fechaDeNacimiento}
+                        </div>
+                        <div>
+                            <label>
+                                <strong>Contacto:</strong>
+                            </label>{" "}
+                            {currentProfesor.contacto.telefono } / {currentProfesor.contacto.email}
                         </div>
                         <div>
                             <label>

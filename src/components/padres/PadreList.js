@@ -21,12 +21,19 @@ const PadresList = () => {
     const [count, setCount] = useState(0);
 
 
+    function cleanSearches() {
+        setSearchNombreApellido("")
+        setSearchAlumno("")
+    }
+
     const onChangeSearchNombreApellido = (e) => {
+        cleanSearches()
         const searchNombreApellido = e.target.value;
         setSearchNombreApellido(searchNombreApellido);
     };
 
     const onChangeSearchAlumno = (e) => {
+        cleanSearches()
         const searchAlumno = e.target.value;
         setSearchAlumno(searchAlumno);
     };
@@ -187,6 +194,12 @@ const PadresList = () => {
                                 <strong>Detalles:</strong>
                             </label>{" "}
                             {currentPadre.detalles}
+                        </div>
+                        <div>
+                            <label>
+                                <strong>Contacto:</strong>
+                            </label>{" "}
+                            {currentPadre.contacto.telefono } / {currentPadre.contacto.email}
                         </div>
                         <div>
                             <label>

@@ -1,16 +1,17 @@
-import React, { useState, useEffect }from "react";
+import React, {useState, useEffect} from "react";
 import swal from '@sweetalert/with-react';
 import Pagination from "@material-ui/lab/Pagination";
 
-import { getUsuarios, deleteUsuario } from "../../actions/usuarios";
+import {getUsuarios, deleteUsuario} from "../../actions/usuarios";
 
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import {handleError, handleResponse} from "../../http-common";
 import config from "../../config";
+import UsuariosService from "../../services/UsuariosService";
 
 const navigateDeleteOkOrError = `${config.appDns}/usuarios`
 
-const UsuariosList  = () => {
+const UsuariosList = () => {
 
     const [usuarios, setUsuarios] = useState([]);
     const [currentUsuario, setCurrentUsuario] = useState(null);
@@ -20,12 +21,10 @@ const UsuariosList  = () => {
     const [count, setCount] = useState(0);
 
 
-
     const onChangeSearchUsername = (e) => {
         const searchUsername = e.target.value;
         setSearchUsername(searchUsername);
     };
-
 
 
     const getRequestParams = (searchUsername, page) => {
@@ -44,7 +43,7 @@ const UsuariosList  = () => {
     const retrieveUsuarios = () => {
         const params = getRequestParams(searchUsername, page);
         getUsuarios(params).then((response) => {
-            const { usuarios, totalPages } = response.data;
+            const {usuarios, totalPages} = response.data;
 
             setUsuarios(usuarios);
             setCount(totalPages);
@@ -54,7 +53,7 @@ const UsuariosList  = () => {
             console.log(response.data);
         }).catch(err => {
             console.log(err)
-            handleError(err,`${config.appDns}/usuarios`,"Hubo un error al buscar los datos de los usuarios")
+            handleError(err, `${config.appDns}/usuarios`, "Hubo un error al buscar los datos de los usuarios")
         });
     };
 
@@ -73,15 +72,50 @@ const UsuariosList  = () => {
 
     const deleteUsuarioById = (id) => {
         deleteUsuario(id).then((response) => {
-            handleResponse(204,response,navigateDeleteOkOrError,"El usuario fue correctamente eliminado.")
+            handleResponse(204, response, navigateDeleteOkOrError, "El usuario fue correctamente eliminado.")
         }).catch(err => {
             console.log(err)
-            handleError(err,navigateDeleteOkOrError,"Hubo un error al eliminar el usuario")
+            handleError(err, navigateDeleteOkOrError, "Hubo un error al eliminar el usuario")
         })
     };
 
+    function askAndShowPass() {
+        swal({
+            text: 'Ingrese su password para realizar dicha acción',
+            type: "info",
+            content: "input",
+            button: {
+                text: "Confirmar",
+                closeModal: false,
+            },
+        }).then(pass => {
+            if (!pass) throw null;
+
+            UsuariosService.login({"username": localStorage.getItem("user"), "password": pass}).then(
+                res => {
+                    swal({
+                        text: `Password del usuario ${currentUsuario.username}: ${currentUsuario.password}`,
+                        icon: "info",
+                        button: "OK"
+                    })
+                }).catch(err => {
+                console.log(err)
+                swal({
+                    title: "Error",
+                    type: "password",
+                    text: "La password ingresada no es la correcta para el usuario.",
+                    icon: "error",
+                    button: "OK"
+                }).then(() => {
+                    window.location = navigateDeleteOkOrError
+                })
+            })
+
+        })
+    }
+
     return (
-        <div className="list row col-md-12" >
+        <div className="list row col-md-12">
             <div className="col-md-8">
                 <div className="input-group mb-3">
                     <input
@@ -127,7 +161,7 @@ const UsuariosList  = () => {
                                 "list-group-item " +
                                 (index === currentIndex ? "active" : "")
                             }
-                            onClick={() =>setActiveUsuario(usuario, index)}
+                            onClick={() => setActiveUsuario(usuario, index)}
                             key={index}
                         >
                             {usuario.username}
@@ -170,37 +204,36 @@ const UsuariosList  = () => {
                             type="button"
                             onClick={() => swal({
                                 title: "Eliminar",
-                                text: "Se va a eliminar el usuario "+currentUsuario.username+". Por favor, confirmar dicha acción.",
+                                text: "Se va a eliminar el usuario " + currentUsuario.username + ". Por favor, confirmar dicha acción.",
                                 icon: "warning",
                                 buttons: ["Cancelar", "Eliminar"]
                             }).then(selection => {
-                                if(selection){
+                                if (selection) {
                                     deleteUsuarioById(currentUsuario.id)
                                 }
                             })
                             }
-                            style={{marginLeft:10}}
+                            style={{marginLeft: 10}}
                         >
                             Eliminar
                         </button>
-                        <Link
-                            to={"/usuario/detail/" + currentUsuario.id}
+                        <button
                             className="btn btn-info btn-sm"
-                            style={{marginLeft:10}}
+                            style={{marginLeft: 10}}
+                            onClick={askAndShowPass}
                         >
-                            Ver
-                        </Link>
+                            Ver Password
+                        </button>
                     </div>
                 ) : (
                     <div>
-                        <br />
+                        <br/>
                         <p>Por favor, seleccione un usuario...</p>
                     </div>
                 )}
             </div>
         </div>
     );
-    // }
 }
 
 export default UsuariosList;
